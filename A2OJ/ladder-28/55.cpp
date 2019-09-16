@@ -6,7 +6,7 @@
 #include <cassert>
 using namespace std;
 //using namespace __gnu_pbds;
-typedef long long lo;
+typedef int lo;
 typedef long double ld;
 #include <ctime>
 typedef pair<lo, lo> ll; //pair
@@ -18,15 +18,16 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define all(v) (v).begin(), (v).end()
 #define TRV(a) for (auto &it : a)
-#define INF 500010
+#define INF 100100
 #define MOD 1000000007
 #define M 1000000007
 #define BLOCK 300
@@ -34,7 +35,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define pb(a) push_back((a))
 #define eps 1e-2
 #define PI acos(-1.0)
-
+lo checkpoint_counter = 0;
 #if _DEBUG
 #define debug(x) cout << #x << "=" << x << endl
 #define debug2(x, y) cout << #x << "=" << x << " " << #y << "=" << y << endl;
@@ -65,8 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
+#define checkpoint cout << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -123,14 +123,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -150,11 +150,56 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+int a[INF], p[INF];
+vll ans;
+void fun(lo i, lo j)
+{
+    if (i > j)
+        swap(i, j);
+    swap(a[i], a[j]);
+    swap(p[a[i]], p[a[j]]);
+    ans.pb(mp(i, j));
+}
+vector<bool> isprime(INF, true);
+vl primes;
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    for (lo i = 2; i * i < INF; i++)
+        if (isprime[i])
+        {
+            for (lo j = i * i; j < INF; j += i)
+                isprime[j] = false;
+        }
+
+    REP(2, INF)
+    if (isprime[i])
+        primes.pb(i);
+    // checkpoint;
+    lo n;
+    cin >> n;
+    REP(1, n + 1)
+    {
+        cin >> a[i];
+        p[a[i]] = i;
+    }
+    lo g;
+    // checkpoint;
+    REP(1, n + 1)
+    {
+        while (p[i] != i)
+        {
+            g = lower_bound(all(primes), p[i] - i + 1) - primes.begin();
+            while (primes[g] > p[i] - i + 1)
+                g--;
+            fun(p[i], p[i] - primes[g] + 1);
+        }
+    }
+    cout << ans.size() << endl;
+    TRV(ans)
+    cout << it.X << " " << it.Y << endl;
     return 0;
 }

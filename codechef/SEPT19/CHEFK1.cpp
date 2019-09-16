@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,8 +66,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +83,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -123,14 +121,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -152,9 +150,42 @@ struct custom_hash
 };
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    cout.precision(20);
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);cout.tie(0);cout.precision(20);
+    lo t;
+    cin >> t;
+    while (t--)
+    {
+        lo n, m;
+        cin >> n >> m;
+        if (m < n - 1 or m > (n * (n + 1) / 2))
+        {
+            cout << -1 << endl;
+            continue;
+        }
+        if (n == 1)
+        {
+            cout << m << endl;
+            continue;
+        }
+        if (n == 2 and m == 1)
+        {
+            cout << 1 << endl;
+            continue;
+        }
+        m -= n + 1;
+        if (m <= 0)
+        {
+            cout << 2 << endl;
+            continue;
+        }
+        m -= n - 1;
+        if (m <= 0)
+        {
+            cout << 3 << endl;
+            continue;
+        }
+        cout << (2 * m + n - 1) / n + 3 << endl;
+    }
     return 0;
 }

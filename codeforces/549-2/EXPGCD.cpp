@@ -18,15 +18,16 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define all(v) (v).begin(), (v).end()
 #define TRV(a) for (auto &it : a)
-#define INF 500010
+#define INF 200010
 #define MOD 1000000007
 #define M 1000000007
 #define BLOCK 300
@@ -65,8 +66,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +83,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -123,14 +121,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -150,11 +148,110 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo power(lo x, lo n)
+{
+    lo res = 1;
+    while (n > 0)
+    {
+        if (n & 1)
+            res = (res * x) % MOD;
+        x = (x * x) % MOD;
+        n/=2;
+    }
+    return res;
+}
+lo inverse(lo n)
+{
+    return power(n, MOD - 2);
+}
+vl result(INF, 0);
+vl gcd_count(INF, 0);
+vl combination(INF, 0);
+vl factors[INF];
+vl answer(INF, 0);
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
     cout.precision(20);
+    lo q, k;
+    cin >> q >> k;
+    vl queries(q);
+    // debug("queries: ");
+    cin >> queries;
+    // debug("after queries");
+    lo n = *max_element(all(queries));
+    combination[k] = 1;
+    // debug("Checkpoint 0");
+    REP(k + 1, n+1)
+    {
+        combination[i] = (((combination[i - 1] * i) % MOD) * inverse(k - i)) % MOD;
+    }
+    // debug("combinations calculated");
+    for (lo i = 1; i * i <= n; i++)
+    {
+        for (lo j = 2 * i; j <= n ; j += i)
+        {
+            factors[j].pb(i);
+            if (i != 1 or i != j)
+                factors[j].pb(n / i);
+            // debug(j);
+        }
+        // debug(i);
+    }
+    REP(2, n+1)
+    {
+        sort(all(factors[i]));
+        reverse(all(factors[i]));
+    }
+    // debug("Checkpoint1");
+    for (lo i = n; i >= 1; i--)
+    {
+        lo x = n / i;
+        gcd_count[i] = combination[x];
+        gcd_count[i] -= result[i];
+        if (gcd_count[i] < 0)
+            gcd_count[i] += MOD;
+        if (gcd_count[i])
+            TRV(factors[i])
+            {
+                result[it] += gcd_count[i];
+                if (result[i] > MOD)
+                    result[i] -= MOD;
+            }
+    }
+    REP(1, n+1)debug2(i, gcd_count[i]);
+    // debug("Checkpoint 2");
+    REP(1, n + 1)
+    {
+        answer[n] += gcd_count[i] * i;
+        answer[n] %= MOD;
+    }
+    IREP(n - 1, 1)
+    {
+        answer[i] = answer[i + 1];
+        lo add = 0;
+        TRV(factors[i + 1])
+        {
+            lo prev = gcd_count[it];
+            gcd_count[it] = combination[(i / it)];
+            result[it] -= gcd_count[i + 1];
+            if (result[it] < 0)
+                result[it] += MOD;
+            for (auto it2 : factors[it])
+            {
+                result[it] += (gcd_count[it] - prev);
+                if (result[it2] < MOD)
+                    result[it2] += MOD;
+            }
+            answer[i] += ((gcd_count[it] - prev) * i) % MOD;
+            if (answer[i] > MOD)
+                answer[i] -= MOD;
+        }
+    }
+    debug("Checkpoint 3");
+    TRV(queries)
+        cout << (answer[it] * inverse(combination[k])) % MOD << endl;
     return 0;
 }

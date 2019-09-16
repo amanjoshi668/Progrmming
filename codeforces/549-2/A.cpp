@@ -65,8 +65,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +82,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -156,5 +153,30 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    vl a(n);
+    cin >> a;
+    lo res1 = 0;
+    lo res2 = 0;
+    REP(0, n)
+    {
+        if (a[i] == 1)
+            res1 = i;
+        else
+            res2 = i;
+    }
+    lo res = min(res1, res2) + 1;
+    cout<<res<<endl;
+    return 0;
+    res1 = res2 = n;
+    IREP(n - 1, 0)
+    {
+        if (a[i] == 1)
+            res1 = i;
+        else
+            res2 = i;
+    }
+    cout << min(res, n - max(res1, res2)) << endl;
     return 0;
 }

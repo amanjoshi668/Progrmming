@@ -26,7 +26,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define all(v) (v).begin(), (v).end()
 #define TRV(a) for (auto &it : a)
-#define INF 500010
+#define INF 1000010
 #define MOD 1000000007
 #define M 1000000007
 #define BLOCK 300
@@ -65,8 +65,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +82,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -150,11 +147,50 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo gcd(lo a, lo b)
+{
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    cout.precision(20);
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
+    // cout.precision(20);
+    lo n;
+    cin >> n;
+    vl G(INF, 0);
+    map<lo, lo> a[2];
+    REP(0, n)
+    {
+        lo num;
+        cin >> num;
+        lo x = i % 2;
+        lo y = x ^ 1;
+        a[y].clear();
+        a[x].insert({0, 1});
+        TRV(a[x])
+        {
+            lo g = gcd(it.X, num);
+            if(present(a[y], g))a[y][g] += it.Y;
+            else a[y].insert({g, it.Y});
+            if (g < INF)
+                G[g]+=it.Y;
+        }
+    }
+    IREP(INF-1, 1)
+    {
+        for (lo j = 2 * i; j < INF; j += i)
+            G[j] += G[i];
+    }
+    lo q;
+    cin>>q;
+    while(q--){
+        lo k;
+        cin>>k;
+        cout<<G[k]<<endl;
+    }
     return 0;
 }

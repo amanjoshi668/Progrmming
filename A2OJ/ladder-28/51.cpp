@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,8 +66,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +83,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -123,14 +121,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -150,11 +148,84 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vl primes;
+void sieve(lo n)
+{
+    vl P(n + 1, true);
+    REP(2, n + 1)
+    {
+        if (P[i])
+        {
+            for (lo k = i; k <= n; k += i)
+                P[k] = false;
+            primes.pb(i);
+        }
+    }
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    string a;
+    cin >> a;
+    lo n = a.length();
+    if (n <= 3)
+    {
+        cout << "YES" << endl
+             << a << endl;
+        return 0;
+    }
+    sieve(n + 1);
+    while (primes.back() * 2 > n)
+        primes.pop_back();
+    vl mark(n, false);
+    vl count(26, 0);
+    REP(0, n)
+    count[a[i] - 'a']++;
+    char max_char = ((max_element(all(count))) - count.begin())+ 'a';
+    lo max_count = *max_element(all(count));
+    debug(primes);
+    REP(1, n + 1)
+    {
+        TRV(primes)
+        if (i % it == 0)
+        {
+            mark[i - 1] = true;
+            a[i-1] = max_char;
+            count[max_char - 'a']--;
+            break;
+        }
+    }
+    // debug(n);
+    debug2(mark[65], a[65]);
+    // cout<<accumulate(all(mark), 0LL)<<endl;
+    REP(1, n+1){
+        bool div = false;
+        TRV(primes)if(i%it == 0)div = true;
+        if(div and a[i-1] != max_char)
+        debug3(i, a[i-1], mark[i-1]);
+    }
+    if (accumulate(all(mark), 0LL) > max_count)
+    {
+        cout << "NO" << endl;
+        return 0;
+    }
+    debug(count);
+    cout << "YES" << endl;
+    REP(0, n)
+    {
+        if (mark[i])
+            continue;
+        REPV(j, 0, 26)
+        if (count[j]>0)
+        {
+            count[j]--;
+            a[i] = j + 'a';
+            break;
+        }
+    }
+    cout << a << endl;
     return 0;
 }

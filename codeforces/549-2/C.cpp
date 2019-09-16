@@ -65,8 +65,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +82,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -150,11 +147,43 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vl g[INF], c(INF);
+set<lo> ans;
+void dfs(lo node)
+{
+    // debug(node);
+    bool bad = c[node];
+    TRV(g[node])
+    {
+        dfs(it);
+        bad &= c[it];
+    }
+    if (bad)
+        ans.insert(node);
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo root = -1;
+    lo n;
+    cin >> n;
+    REP(0, n)
+    {
+        lo p;
+        // cout<<n<<endl;
+        cin >> p >> c[i + 1];
+        if (p != -1)
+            g[p].pb(i + 1);
+        else
+            root = i + 1;
+    }
+    dfs(root);
+    if (ans.empty())
+        cout << -1 << endl;
+    else
+        cout << ans;
     return 0;
 }

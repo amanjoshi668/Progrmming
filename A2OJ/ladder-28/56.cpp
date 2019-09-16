@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -150,11 +151,69 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vector<string> G;
+bool visited[55][55];
+lo n, m;
+vl dx = {0, 1, 0, -1};
+vl dy = {-1, 0, 1, 0};
+lo num_element = 0;
+lo dfs(lo x, lo y)
+{
+    lo ans = 1;
+    visited[x][y] = 1;
+    REP(0, 4)
+    {
+        lo nx = x + dx[i];
+        lo ny = y + dy[i];
+        // derr2(nx, ny);
+        if (correct(nx, ny, n, m) and G[nx][ny] == '#' and !visited[nx][ny])
+        {
+            ans += dfs(nx, ny);
+        }
+    }
+    return ans;
+}
+bool fun()
+{
+    // checkpoint;
+    memset(visited, false, sizeof(visited));
+    REPE(0, n, 0, m)
+    if (G[i][j] == '#')
+    {
+        lo res = dfs(i, j);
+        debug3(i, j, res);
+        return res != num_element - 1;
+    }
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    cin >> n >> m;
+    G.resize(n);
+    REP(0, n)
+    cin >> G[i];
+    lo ans = 2;
+    checkpoint;
+    REPE(0, n, 0, m)
+    num_element += (G[i][j] == '#');
+    checkpoint if (num_element <= 2)
+    {
+        cout << "-1" << endl;
+        return 0;
+    }
+    REPE(0, n, 0, m)
+    {
+        if (G[i][j] == '#')
+        {
+            G[i][j] = '.';
+            if (fun())
+                ans = 1;
+            G[i][j] = '#';
+        }
+    }
+    cout << ans << endl;
     return 0;
 }

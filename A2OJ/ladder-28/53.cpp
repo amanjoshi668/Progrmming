@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,8 +66,6 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
-#define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
 #define debug(x) ;
@@ -84,7 +83,6 @@ lo checkpoint_counter=0;
 #define derr5(x, y, z, r, t) ;
 #define derr6(x, y, z, r, t, s) ;
 #define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
 #endif
 
 #define print_matrix(a, n, m) \
@@ -98,7 +96,7 @@ ostream &operator<<(ostream &o, vector<T> v)
         o << v[0];
     for (unsigned i = 1; i < v.size(); i++)
         o << " " << v[i];
-    return o << " ";
+    return o << endl;
 }
 template <typename U, typename V>
 ostream &operator<<(ostream &o, pair<U, V> p)
@@ -123,14 +121,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -156,5 +154,46 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    vll a;
+    lo sum = 0;
+    REP(0, n)
+    {
+        lo x;
+        cin >> x;
+        sum += x;
+        a.pb(mp(x, i + 1));
+    }
+    sort(all(a));
+    reverse(all(a));
+    vl ans, ans2;
+    lo diff = 0;
+    for (lo i = 0; i < n - 1; i += 2)
+    {
+        if (diff < 0)
+        {
+            diff += a[i + 1].X - a[i].X;
+            ans.pb(a[i].Y);
+            ans2.pb(a[i + 1].Y);
+        }
+        else
+        {
+            diff += a[i].X - a[i + 1].X;
+            ans.pb(a[i + 1].Y);
+            ans2.pb(a[i].Y);
+        }
+    }
+    if (n % 2)
+    {
+        if (diff < 0)
+            ans.pb(a[n - 1].Y);
+        else
+            ans2.pb(a[n - 1].Y);
+    }
+    cout << ans.size() << endl;
+    cout << ans;
+    cout << ans2.size() << endl;
+    cout << ans2;
     return 0;
 }

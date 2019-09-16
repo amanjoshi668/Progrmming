@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 struct custom_hash
@@ -156,5 +157,43 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, m;
+    cin >> n >> m;
+    vl a(n);
+    cin >> a;
+    vll S;
+    REP(0, m)
+    {
+        lo x, y;
+        cin >> x >> y;
+        y--;
+        while (!S.empty())
+        {
+            if (S.back().X > y)
+                break;
+            S.pop_back();
+        }
+        S.push_back(mp(y, x));
+    }
+    vl ans(n);
+    REP(S[0].X + 1, n)
+    ans[i] = a[i];
+    sort(a.begin(), a.begin() + S[0].first + 1);
+    // cout<<S;
+    S.push_back(mp(-1, -1));
+    lo st = 0, en = S[0].first;
+    REP(0, S.size() - 1)
+    {
+        debug3(i, S[i].X, S[i + 1].X + 1);
+        for (lo j = S[i].X; j >= S[i + 1].X + 1; j--)
+        {
+            debug3(j, en, st);
+            if (S[i].Y == 1)
+                ans[j] = a[en--];
+            else
+                ans[j] = a[st++];
+        }
+    }
+    cout << ans;
     return 0;
 }

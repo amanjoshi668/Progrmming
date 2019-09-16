@@ -156,5 +156,22 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin>>n;
+    vl a(n+2, 0);
+    REP(1, n+1)cin>>a[i];
+    vl res(n+2, 0);
+    lo worst = 0;
+    REP(1, n+1){
+        worst = min(worst, a[i] - i);
+        res[i] = i + worst;
+    }
+    worst = n+1;
+    IREP(n, 1){
+        worst = min(worst, a[i] + i);
+        res[i] = min(res[i], worst - i);
+    }
+    cout<<*max_element(all(res));
+    
     return 0;
 }
