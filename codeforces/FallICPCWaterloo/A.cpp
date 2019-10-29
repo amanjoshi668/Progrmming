@@ -172,11 +172,26 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo gcd(lo a, lo b){
+    if(b==0)return a;
+    return gcd(b, a%b);
+}
+lo lcm(lo a, lo b){
+    return (a*b)/gcd(a, b);
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo a, b, c;
+    cin>>a>>b>>c;
+    lo l = lcm(a, b);
+    l = lcm(l, c);
+    cout<<c<<endl;
+    REP(0, c){
+        cout<<1<<" "<<(i%a)+1<<" "<<
+    }
     return 0;
 }

@@ -172,11 +172,47 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vl dx = {-1, -1, 0, 1, 1, 1, 0, -1};
+vl dy = {0, -1, -1, -1, 0, 1, 1, 1};
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin>>n;
+    vector<string> a(n);
+    cin>>a;
+    lo kx = 0, ky = 0;
+    REPE(0, n, 0, n)if(a[i][j] == 'K'){
+        kx = i;
+        ky = j;
+        break;
+    }
+    debug2(kx, ky);
+    REP(0, 8){
+        lo nx = kx + dx[i];
+        lo ny = ky + dy[i];
+        if(correct(nx, ny, n, n))if(a[nx][ny] == '*')a[nx][ny] = '?';
+    }
+    lo ans = 0;
+    bool res = true;
+    REPE(0, n-1, 0, n-1){
+        if(a[i][j] == '*'){
+            if(correct(i+1, j+1, n, n) and a[i+1][j+1] == '-'){
+                if(a[i][j] == '*')a[i][j+2] = '-';
+                ans ++;  
+            }
+            else if(correct(i+1, j-1, n, n) and a[i+1][j-1] == '-'){
+                ans ++;
+            }
+            else {
+                cout<<-1<<endl;
+                exit(0);
+            }
+        }
+    }
+    cout<<ans<<endl;
     return 0;
 }

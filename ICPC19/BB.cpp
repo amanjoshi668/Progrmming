@@ -178,5 +178,20 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n;
+        cin>>n;
+        vl a(n);
+        cin>>a;
+        sort(all(a));
+        reverse(all(a));
+        lo ans = 0;
+        lo index = 1;
+        REP(0, n){
+            
+        }
+    }
     return 0;
 }

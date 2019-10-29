@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -178,5 +179,56 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin >> t;
+    while (t--)
+    {
+        lo n, m;
+        cin >> n >> m;
+        vvl a(n, vl(m));
+        cin >> a;
+        vvl tl, tr, bl, br;
+        tl = tr = bl = br = a;
+        REPE(0, n, 0, m)
+        {
+            if (i > 0)
+                tl[i][j] = max(tl[i][j], tl[i - 1][j]);
+            if (j > 0)
+                tl[i][j] = max(tl[i][j], tl[i][j - 1]);
+        }
+        REP(0, n)
+        IREPV(j, m - 1, 0)
+        {
+            if (i > 0)
+                tr[i][j] = max(tr[i][j], tr[i - 1][j]);
+            if (j < m - 1)
+                tr[i][j] = max(tr[i][j], tr[i][j + 1]);
+        }
+        IREP(n - 1, 0)
+        REPV(j, 0, m)
+        {
+            if (i < n - 1)
+                bl[i][j] = max(bl[i][j], bl[i + 1][j]);
+            if (j > 0)
+                bl[i][j] = max(bl[i][j], bl[i][j - 1]);
+        }
+        IREP(n - 1, 0)
+        IREPV(j, m - 1, 0)
+        {
+            if (i < n - 1)
+                br[i][j] = max(br[i][j], br[i + 1][j]);
+            if (j < m - 1)
+                br[i][j] = max(br[i][j], br[i][j + 1]);
+        }
+        lo ans = LLONG_MAX;
+        REPE(1, n - 1, 1, m - 1)
+        {
+            ans = min(ans,
+                      vmax(tl[i - 1][j - 1], tr[i - 1][j + 1], bl[i + 1][j - 1], br[i + 1][j + 1]) -
+                          vmin(tl[i - 1][j - 1], tr[i - 1][j + 1], bl[i + 1][j - 1], br[i + 1][j + 1]));
+        }
+        cout
+            << ans << endl;
+    }
     return 0;
 }

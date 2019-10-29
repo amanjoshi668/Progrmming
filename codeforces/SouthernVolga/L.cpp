@@ -178,5 +178,37 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, k;
+    cin>>n>>k;
+    string a, b;
+    cin>>a>>b;
+    reverse(all(a));
+    REP(0, k+1)a+='0';
+    a+=b;
+    lo l, r;
+    REP(0, a.length())if(a[i] == '1'){
+        l = i;
+        break;
+    }
+    IREP(a.length() - 1, 0)if(a[i] == '1'){
+        r=  i;
+        break;
+    }
+    lo mid = (l+r)/2;
+    if(mid >=n and mid<n+k){
+        if(r-n+1 < n+k+1-l)mid = n-1;
+        else mid = n + k + 1;
+    }
+
+    debug3(l, r, mid);
+    cout<<max(mid - l, r- mid)<<endl;
+    if(mid < n){
+        cout<<"2"<<" ";
+        cout<<n - mid;
+    }
+    else {
+        cout<<1<<" ";
+        cout<<mid - n - k;
+    }
     return 0;
 }

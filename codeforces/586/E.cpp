@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -28,7 +29,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -91,6 +92,8 @@ lo checkpoint_counter=0;
     REPE(0, n, 0, m) { cout << (a)[i][j] << ((j == m - 1) ? '\n' : ' '); }
 #define present(container, element) (container.find(element) != container.end())
 #define endl "\n"
+#define add(a) accumulate(all(a), lo(0));
+#define add(a, x) accumulate(all(a), x);
 template <typename T>
 ostream &operator<<(ostream &o, vector<T> v)
 {
@@ -123,37 +126,15 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
-}
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
 }
 struct custom_hash
 {
@@ -172,11 +153,82 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vvl G;
+vvl T;
+vl a, par(INF), dp(INF, 0), dp2(INF, 0), visited(INF, 0);
+void dfs(lo node)
+{
+    visited[node] = true;
+    TRV(G[node])
+    if (!visited[it])
+    {
+        par[it] = node;
+        dfs(it);
+    }
+}
+void dfs2(lo node)
+{
+    lo mx = 0;
+    TRV(T[node])
+    if (it != par[node])
+    {
+        dfs2(it);
+        mx = max(mx, dp2[it]);
+    }
+    dp2[node] = a[node] + mx;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, m;
+    cin >> n >> m;
+    a.resize(n);
+    cin >> a;
+    G.resize(n);
+    T.resize(n);
+    REP(0, m)
+    {
+        lo u, v;
+        cin >> u >> v;
+        u--, v--;
+        G[u].pb(v);
+        G[v].pb(u);
+    }
+    lo start;
+    cin >> start;
+    start--;
+    par[start] = start;
+    dfs(start);
+    REP(0, n)
+    if (i != start)
+    {
+        T[i].pb(par[i]);
+        T[par[i]].pb(i);
+    }
+    REP(0, n)
+    if (G[i].size() > T[i].size()) dp[i] = 1;
+    REP(0, n)
+    if (dp[i])
+    {
+        auto temp = par[i];
+        while (dp[temp] == 0)
+        {
+            dp[temp] = 1;
+            temp = par[temp];
+        }
+    }
+    dfs2(start);
+    lo res = 0, ans = 0;
+    REP(0, n)
+    {
+        if (dp[i] == 0)
+            ans = max(ans, dp2[i]);
+        else
+            res += a[i];
+    }
+    cout << res + ans << endl;
     return 0;
 }

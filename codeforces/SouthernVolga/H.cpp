@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -178,5 +179,24 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    vl a(n);
+    cin >> a;
+    map<lo, lo> M[n];
+    lo ans = 2;
+    IREP(n - 2, 0)
+    {
+        REPV(j, i + 1, n)
+        {
+            lo diff = a[j] - a[i];
+            if (present(M[j], diff))
+                M[i][diff] = M[j][diff] + 1;
+            else
+                M[i][diff] = 1;
+            ans = max(ans, M[i][diff] + 1);
+        }
+    }
+    cout << ans << endl;
     return 0;
 }

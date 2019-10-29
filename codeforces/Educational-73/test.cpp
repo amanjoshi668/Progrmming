@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -28,7 +29,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -91,6 +92,8 @@ lo checkpoint_counter=0;
     REPE(0, n, 0, m) { cout << (a)[i][j] << ((j == m - 1) ? '\n' : ' '); }
 #define present(container, element) (container.find(element) != container.end())
 #define endl "\n"
+#define add(a) accumulate(all(a), lo(0));
+#define add(a, x) accumulate(all(a), x);
 template <typename T>
 ostream &operator<<(ostream &o, vector<T> v)
 {
@@ -123,37 +126,15 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
-}
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
 }
 struct custom_hash
 {
@@ -172,11 +153,138 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+
+class SEGMENT_TREE
+{
+    lo n;
+    vl seg_tree;
+    vl lazy;
+    public:
+    SEGMENT_TREE(lo n)
+    {
+        this->n = n;
+        seg_tree.resize(4*(n + 1));
+        lazy.resize(4*(n + 1));
+        fill(all(seg_tree), 0LL);
+        fill(all(lazy), 0LL);
+    }
+    void build(lo node, lo start, lo end, vl &a)
+    {
+        if (start == end)
+        {
+            seg_tree[node] = a[node];
+        }
+        else
+        {
+            lo mid = (start + end) / 2;
+            build(2 * node + 1, start, mid, a);
+            build(2 * node + 2, mid + 1, end, a);
+            seg_tree[node] = max(seg_tree[node * 2 + 1] , seg_tree[node * 2 + 2]);
+            return;
+        }
+    }
+    void update(lo node, lo start, lo end, lo l, lo r, lo val)
+    {
+        if (lazy[node] != 0)
+        {
+            // This node needs to be updated
+            seg_tree[node] = max(seg_tree[node],  lazy[node]); // Update it
+            if (start != end)
+            {
+                lazy[node * 2 + 1] = lazy[node]; // Mark child as lazy
+                lazy[node * 2 + 2] = lazy[node]; // Mark child as lazy
+            }
+            lazy[node] = 0; // Reset it
+        }
+        if (start > end or start > r or end < l)
+            return;
+        if (start >= l and end <= r)
+        {
+            // Segment is fully within range
+            seg_tree[node] = max(seg_tree[node],  val);
+            if (start != end)
+            {
+                // Not leaf node
+                lazy[node * 2 + 1] = val;
+                lazy[node * 2 + 2] = val;
+            }
+            return;
+        }
+        lo mid = (start + end) / 2;
+        update(node * 2 + 1, start, mid, l, r, val);                      // Updating left child
+        update(node * 2 + 2, mid + 1, end, l, r, val);                    // Updating right child
+        seg_tree[node] = max(seg_tree[node * 2 + 1] , seg_tree[node * 2 + 2]); // Updating root with max value
+    }
+    lo queryRange(lo node, lo start, lo end, lo l, lo r)
+    {
+        if (start > end or start > r or end < l)
+            return 0; // Out of range
+        if (lazy[node] != 0)
+        {
+            // This node needs to be updated
+            seg_tree[node] = max(seg_tree[node], lazy[node]); // Update it
+            if (start != end)
+            {
+                lazy[node * 2 + 1] = lazy[node]; // Mark child as lazy
+                lazy[node * 2 + 2] = lazy[node]; // Mark child as lazy
+            }
+            lazy[node] = 0; // Reset it
+        }
+        if (start >= l and end <= r)
+            return seg_tree[node];
+        lo mid = (start + end) / 2;
+        lo p1 = queryRange(node * 2 + 1, start, mid, l, r);   // Query left child
+        lo p2 = queryRange(node * 2 + 2, mid + 1, end, l, r); // Query right child
+        return max(p1 , p2);
+    }
+    void update(lo l, lo r, lo val)
+    {
+        update(0, 0, n-1, l, r, val);
+    }
+    void update(lo l, lo val)
+    {
+        update(l, l, val);
+    }
+    lo query(lo l, lo r)
+    {
+        return queryRange(0, 0, n-1, l, r);
+    }
+};
+
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    string s;
+    cin >> s;
+    auto n = s.length();
+    vector<lo> d1(n);
+    lo l = 0, r = -1;
+    for (lo i = 0; i < n; ++i)
+    {
+        lo k = (i > r ? 0 : min(d1[l + r - i], r - i)) + 1;
+        while (i + k < n && i - k >= 0 && s[i + k] == s[i - k])
+            ++k;
+        d1[i] = k--;
+        if (i + k > r)
+            l = i - k, r = i + k;
+    }
+    SEGMENT_TREE LTree(n);
+    SEGMENT_TREE RTree(n);
+    for(lo i=0;i<n; i++){
+        LTree.update(i+d1[i] - 1, i+d1[i] - 1, 2 * d1[i] - 1);
+    }
+    // checkpoint;
+    for(lo i=n-1;i>0; i--){
+        RTree.update(i-d1[i] + 1, i-d1[i] + 1, 2 * d1[i] - 1);
+    }
+    // checkpoint;
+    auto ans = 0LL;
+    for(lo i=0;i<n-1; i++){
+        ans = max(ans, LTree.query(0LL, i) * RTree.query(i+1 , n-1));
+    }
+    cout<<ans;
     return 0;
 }

@@ -213,37 +213,20 @@ lo lca(lo v1, lo v2)
 /////////////////////////////////////////////////////////////////////SEGMENT TREE
 class SEGMENT_TREE
 {
-    lo n;
     vl seg_tree;
     vl lazy;
-    bool islazy;
-
-public:
-    SEGMENT_TREE(lo n, bool _islazy = true)
+    SEGMENT_TREE(lo n)
     {
-        this->n = n;
-        this->islazy = _islazy;
-        seg_tree.resize(4 * (n + 1));
+        seg_tree.resize(n + 1);
+        lazy.resize(n + 1);
         fill(all(seg_tree), 0LL);
-        if (this->islazy)
-        {
-            lazy.resize(4 * (n + 1));
-            fill(all(lazy), 0LL);
-        }
-    }
-    void reset(lo value = 0)
-    {
-        fill(all(seg_tree), value);
-        if (islazy)
-        {
-            fill(all(lazy), 0LL);
-        }
+        fill(all(lazy), 0LL);
     }
     void build(lo node, lo start, lo end, vl &a)
     {
         if (start == end)
         {
-            seg_tree[node] = a[node];
+            seg_tree[node] = a[start];
         }
         else
         {
@@ -256,19 +239,16 @@ public:
     }
     void update(lo node, lo start, lo end, lo l, lo r, lo val)
     {
-        if (this->islazy)
+        if (lazy[node] != 0)
         {
-            if (lazy[node] != 0)
+            // This node needs to be updated
+            seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+            if (start != end)
             {
-                // This node needs to be updated
-                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
-                if (start != end)
-                {
-                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
-                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
-                }
-                lazy[node] = 0; // Reset it
+                lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
             }
+            lazy[node] = 0; // Reset it
         }
         if (start > end or start > r or end < l)
             return;
@@ -276,14 +256,11 @@ public:
         {
             // Segment is fully within range
             seg_tree[node] += (end - start + 1) * val;
-            if (this->islazy)
+            if (start != end)
             {
-                if (start != end)
-                {
-                    // Not leaf node
-                    lazy[node * 2 + 1] += val;
-                    lazy[node * 2 + 2] += val;
-                }
+                // Not leaf node
+                lazy[node * 2 + 1] += val;
+                lazy[node * 2 + 2] += val;
             }
             return;
         }
@@ -296,19 +273,16 @@ public:
     {
         if (start > end or start > r or end < l)
             return 0; // Out of range
-        if (this->islazy)
+        if (lazy[node] != 0)
         {
-            if (lazy[node] != 0)
+            // This node needs to be updated
+            seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+            if (start != end)
             {
-                // This node needs to be updated
-                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
-                if (start != end)
-                {
-                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
-                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
-                }
-                lazy[node] = 0; // Reset it
+                lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
             }
+            lazy[node] = 0; // Reset it
         }
         if (start >= l and end <= r)
             return seg_tree[node];
@@ -319,7 +293,7 @@ public:
     }
     void update(lo l, lo r, lo val)
     {
-        update(0, 0, n - 1, l, r, val);
+        update(0, 0, n, l, r, val);
     }
     void update(lo l, lo val)
     {
@@ -327,7 +301,7 @@ public:
     }
     lo query(lo l, lo r)
     {
-        return queryRange(0, 0, n - 1, l, r);
+        return queryRange(0, 0, n, l, r);
     }
 };
 ///////////////////////////////////////////////////////////Z_FUNCTION
@@ -886,20 +860,20 @@ class SUFFIX_AUTOMATON
 class LCA
 {
     lo dep[INF], fa[INF][18];
-    void dfs(lo p, lo f, lo lv)
+    void dfs(lo node, lo par, lo lv)
     {
-        dep[p] = lv;
-        fa[p][0] = f;
+        dep[node] = lv;
+        fa[node][0] = par;
         REP(1, 18)
         {
-            if (fa[p][i - 1] == -1)
-                fa[p][i] = -1;
+            if (fa[node][i - 1] == -1)
+                fa[node][i] = -1;
             else
-                fa[p][i] = fa[fa[p][i - 1]][i - 1];
+                fa[node][i] = fa[fa[node][i - 1]][i - 1];
         }
-        TRV(g[p])
-        if (it != f)
-            dfs(it, p, lv + 1);
+        TRV(g[node])
+        if (it != par)
+            dfs(it, node, lv + 1);
     }
     inline lo bit(lo x, lo i) { return (x >> i) & 1; }
     lo lca(lo a, lo b)

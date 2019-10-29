@@ -28,7 +28,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define M 1000000007
+#define MOD2 1000000009
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -132,6 +132,28 @@ ostream &operator<<(ostream &o, map<T, U> v)
     TRV(v)
         o << it << " ";
     return o << endl;
+}
+template <typename T>
+T &&vmin(T &&val)
+{
+    return std::forward<T>(val);
+}
+
+template <typename T0, typename T1, typename... Ts>
+auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
+{
+    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
+}
+template <typename T>
+T &&vmax(T &&val)
+{
+    return std::forward<T>(val);
+}
+
+template <typename T0, typename T1, typename... Ts>
+auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
+{
+    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
 }
 struct custom_hash
 {

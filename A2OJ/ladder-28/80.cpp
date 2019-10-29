@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -172,11 +173,186 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+class SEGMENT_TREE
+{
+    lo n;
+    vl seg_tree;
+    vl lazy;
+    bool islazy;
+
+public:
+    SEGMENT_TREE(lo n, bool _islazy = true)
+    {
+        this->n = n;
+        this->islazy = _islazy;
+        seg_tree.resize(4 * (n + 1));
+        fill(all(seg_tree), 0LL);
+        if (this->islazy)
+        {
+            lazy.resize(4 * (n + 1));
+            fill(all(lazy), 0LL);
+        }
+    }
+    void reset(lo value = 0)
+    {
+        fill(all(seg_tree), value);
+        if (islazy)
+        {
+            fill(all(lazy), 0LL);
+        }
+    }
+    void build(lo node, lo start, lo end, vl &a)
+    {
+        if (start == end)
+        {
+            seg_tree[node] = a[node];
+        }
+        else
+        {
+            lo mid = (start + end) / 2;
+            build(2 * node + 1, start, mid, a);
+            build(2 * node + 2, mid + 1, end, a);
+            seg_tree[node] = seg_tree[node * 2 + 1] + seg_tree[node * 2 + 2];
+            return;
+        }
+    }
+    void update(lo node, lo start, lo end, lo l, lo r, lo val)
+    {
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start > end or start > r or end < l)
+            return;
+        if (start >= l and end <= r)
+        {
+            // Segment is fully within range
+            seg_tree[node] += (end - start + 1) * val;
+            if (this->islazy)
+            {
+                if (start != end)
+                {
+                    // Not leaf node
+                    lazy[node * 2 + 1] += val;
+                    lazy[node * 2 + 2] += val;
+                }
+            }
+            return;
+        }
+        lo mid = (start + end) / 2;
+        update(node * 2 + 1, start, mid, l, r, val);                      // Updating left child
+        update(node * 2 + 2, mid + 1, end, l, r, val);                    // Updating right child
+        seg_tree[node] = seg_tree[node * 2 + 1] + seg_tree[node * 2 + 2]; // Updating root with max value
+    }
+    lo queryRange(lo node, lo start, lo end, lo l, lo r)
+    {
+        if (start > end or start > r or end < l)
+            return 0; // Out of range
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start >= l and end <= r)
+            return seg_tree[node];
+        lo mid = (start + end) / 2;
+        lo p1 = queryRange(node * 2 + 1, start, mid, l, r);   // Query left child
+        lo p2 = queryRange(node * 2 + 2, mid + 1, end, l, r); // Query right child
+        return (p1 + p2);
+    }
+    void update(lo l, lo r, lo val)
+    {
+        update(0, 0, n - 1, l, r, val);
+    }
+    void update(lo l, lo val)
+    {
+        update(l, l, val);
+    }
+    lo query(lo l, lo r)
+    {
+        return queryRange(0, 0, n - 1, l, r);
+    }
+    lo query(lo l)
+    {
+        return query(0, l - 1);
+    }
+    void update(lo x)
+    {
+        update(x, 1);
+    }
+};
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    SEGMENT_TREE Tree(n, false);
+    vl a(n);
+    REPV(t, 0, 2)
+    {
+        Tree.reset();
+        REP(0, n)
+        {
+            lo x;
+            cin >> x;
+            a[i] += x - Tree.query(x);
+            Tree.update(x);
+        }
+    }
+    IREP(n - 1, 0)
+    {
+        lo mod = n - i;
+        if (a[i] >= mod)
+        {
+            a[i] -= mod;
+            if (i)
+                a[i - 1]++;
+        }
+    }
+    Tree.reset();
+    // cout<<a;
+    REP(0, n)
+    {
+        lo l = 0;
+        lo r = n;
+        lo ans = 0;
+        while (l <= r)
+        {
+            lo mid = (l + r) / 2;
+            if (mid - Tree.query(mid) <= a[i])
+            {
+                ans = max(mid, ans);
+                l = mid + 1;
+            }
+            else
+            {
+                r = mid - 1;
+            }
+        }
+        cout << ans << " ";
+        Tree.update(ans);
+    }
     return 0;
 }

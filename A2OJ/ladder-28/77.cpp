@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -178,5 +179,32 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    lo dp[2][26][26];
+    memset(dp, -1LL, sizeof(dp));
+    REP(0, n)
+    {
+        lo turn = i % 2;
+        lo other = turn ^ 1;
+        string s;
+        cin >> s;
+        lo x = s[0] - 'a';
+        lo y = s.back() - 'a';
+        REPV(j, 0, 26)
+        if (dp[other][j][x] != -1)
+            dp[turn][j][y] = max(dp[turn][j][y], dp[other][j][x] + lo(s.length()));
+        dp[turn][x][y] = max(dp[turn][x][y], lo(s.length()));
+        REPV(j, 0, 26)
+        dp[other][j][y] = dp[turn][j][y];
+        dp[other][x][y] = dp[turn][x][y];
+    }
+    lo ans = 0;
+    // print_matrix(dp[1], 26, 26);
+    REP(0, 26)
+    {
+        ans = max(ans, dp[n & 1][i][i]);
+    }
+    cout << ans << endl;
     return 0;
 }

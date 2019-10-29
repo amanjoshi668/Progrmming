@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -178,5 +179,47 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin >> t;
+    while (t--)
+    {
+        lo a, b;
+        cin >> a >> b;
+        string signa = "", signb = "";
+        // if(a<0 and b<0)
+        if (a < 0)
+        {
+            a *= -1;
+            signa = "-";
+        }
+        if (b < 0)
+        {
+            b*=-1;
+            signb = "-";
+        }
+        vl an, bn;
+        lo prod = 1;
+        while (a > 0)
+        {
+            if(a%10)an.pb((a % 10) * prod);
+            prod *= 10;
+            a /= 10;
+        }
+        prod = 1;
+        while (b > 0)
+        {
+            if(b%10)bn.pb((b % 10) * prod);
+            prod *= 10;
+            b /= 10;
+        }
+        debug2(an, bn);
+        REPE(0, an.size(), 0, bn.size())
+        {
+            cout << signa << an[i] << " x " << signb << bn[j] << " ";
+            if (i != an.size() - 1 or j != bn.size() - 1)
+                cout << "+ ";
+        }
+        cout << endl;
+    }
     return 0;
 }

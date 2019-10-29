@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 #include <unistd.h>
 //#include <ext/pb_ds/assoc_container.hpp> // Common file
@@ -18,15 +19,16 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define all(v) (v).begin(), (v).end()
 #define TRV(a) for (auto &it : a)
-#define INF 500010
+#define INF 20010
 #define MOD 1000000007
 #define MOD2 1000000009
 #define BLOCK 300
@@ -65,7 +67,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +125,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -172,11 +174,96 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+ll find_segment(lo x, lo y, lo r, lo index)
+{
+    lo c = (y - index) * (y - index) + x * x - r * r;
+    ld p = sqrt(x * x - c);
+    ld x1 = ld(x) - p;
+    ld x2 = ld(x) + p;
+    lo t = ceil(x1);
+    return {max(0LL, t), floor(x2)};
+}
+vll merge(vector<ll> seg)
+{
+    if (seg.empty())
+        return seg;
+    sort(all(seg));
+    vector<ll> result;
+    result.push_back(seg[0]);
+    int last_pos = 0;
+    for (int i = 0; i < seg.size(); i++)
+    {
+        ll last_seg = result[last_pos];
+        if (seg[i].first <= last_seg.second)
+        {
+            last_seg.second = seg[i].second;
+            result[last_pos] = last_seg;
+        }
+        else
+        { // create new segment
+            last_pos++;
+            result.push_back(seg[i]);
+        }
+    }
+    return result;
+}
+
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    // cout<<sqrt(25);
+    lo g;
+    cin >> g;
+    vll goblin(g);
+    cin >> goblin;
+    lo m;
+    cin >> m;
+    vll segment[INF];
+    REP(0, m)
+    {
+        lo x, y, r;
+        cin >> x >> y >> r;
+        REPV(j, -r, r + 1)
+        if (y + j >= 0)
+            segment[y + j].pb(find_segment(x, y, r, y + j));
+    }
+    lo ans = 0;
+    REP(0, INF)
+    {
+        segment[i] = merge(segment[i]);
+        // TRV(segment[i])
+        // swap(it.X, it.Y);
+    }
+    checkpoint;
+    REP(0, 4)
+    debug2(i, segment[i]);
+    REP(0, g)
+    {
+        lo x = goblin[i].X;
+        lo y = goblin[i].Y;
+        if (segment[x].empty())
+            continue;
+        auto t = lower_bound(all(segment[x]), mp(y, 0LL));
+        if (t == segment[x].end())
+        {
+            auto d = *segment[x].rbegin();
+            if (y >= d.X and y <= d.Y)
+                ans++;
+            continue;
+        }
+        debug(goblin[i]);
+        if (t->X == y)
+            ans++;
+        else if (t != segment[x].begin())
+        {
+            t--;
+            if (y >= t->X and y <= t->Y)
+                ans++;
+        }
+    }
+    cout << g - ans << endl;
     return 0;
 }

@@ -32,7 +32,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
-#define eps 1e-2
+#define eps 1e-5
 #define PI acos(-1.0)
 
 #if _DEBUG
@@ -178,5 +178,20 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo k;
+    cin>>k;
+    lo x = sqrt(k + eps);
+    set<lo> ans;
+    REP(1, x+1){
+        lo t = i*i+k;
+        lo z = sqrt(t + eps);
+        if(z * z == t)ans.insert(i*i);
+        t = i*i - k;
+        if(t < 0) t*=-1;
+        z = sqrt(t + eps);
+        if(z*z == t and t)ans.insert(-i*i);
+    }
+    cout<<ans.size()<<endl;
+    TRV(ans)cout<<it<<" ";
     return 0;
 }

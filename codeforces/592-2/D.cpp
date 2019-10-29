@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -172,11 +173,87 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo n;
+vl color[3];
+vvl g;
+vl a;
+void dfs(lo node, lo par)
+{
+    if (g[node].size() > 2)
+    {
+        cout << "-1" << endl;
+        exit(0);
+    }
+    a.pb(node);
+    TRV(g[node])
+    if (it != par)
+        dfs(it, node);
+}
+lo fun(vl &c1, vl &c2, vl &c3)
+{
+    // debug3(i, j, k);
+    lo res = 0;
+    REP(0, n)
+    {
+        if (i % 3 == 0)
+            res += c1[a[i]];
+        else if (i % 3 == 1)
+            res += c2[a[i]];
+        else
+            res += c3[a[i]];
+    }
+    return res;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    // lo n;
+    cin >> n;
+    REP(0, 3)
+    {
+        color[i].resize(n);
+        cin >> color[i];
+    }
+    g.resize(n);
+    REP(0, n - 1)
+    {
+        lo x, y;
+        cin >> x >> y;
+        x--;
+        y--;
+        g[x].pb(y);
+        g[y].pb(x);
+    }
+    lo start = 0;
+    REP(0, n)
+    if (g[i].size() == 1)
+        start = i;
+    dfs(start, -1);
+    vvl dp(n, vl(6, 0));
+    debug(a);
+    lo ans = LLONG_MAX;
+    vl res(3);
+    REPE(0, 3, 0, 3)
+    REPV(k, 0, 3)
+    if (i != j and i != k and j != k)
+    {
+        lo jj = fun(color[i], color[j], color[k]);
+        debug4(i, j, k, jj);
+        if (jj < ans)
+        {
+            ans = jj;
+            res = {i + 1, j + 1, k + 1};
+        }
+    }
+    cout << ans << endl;
+    vl print_res(n);
+    REP(0, n)
+    {
+        print_res[a[i]] = res[i % 3];
+    }
+    cout << print_res;
     return 0;
 }

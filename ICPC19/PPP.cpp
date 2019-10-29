@@ -35,7 +35,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define eps 1e-2
 #define PI acos(-1.0)
 
-#if _DEBUG
+// #if _DEBUG
 #define debug(x) cout << #x << "=" << x << endl
 #define debug2(x, y) cout << #x << "=" << x << " " << #y << "=" << y << endl;
 #define debug3(x, y, z) cout << #x << "=" << x << " " << #y << "=" << y << " " << #z << "=" << z << endl;
@@ -68,24 +68,24 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 lo checkpoint_counter=0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
-#else
-#define debug(x) ;
-#define debug2(x, y) ;
-#define debug3(x, y, z) ;
-#define debug4(x, y, z, q) ;
-#define debug5(x, y, z, r, t) ;
-#define debug6(x, y, z, r, t, s) ;
-#define debug7(x, y, z, r, t, s, u) ;
-#define wait ;
-#define derr(x) ;
-#define derr2(x, y) ;
-#define derr3(x, y, z) ;
-#define derr4(x, y, z, q) ;
-#define derr5(x, y, z, r, t) ;
-#define derr6(x, y, z, r, t, s) ;
-#define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
-#endif
+// #else
+// #define debug(x) ;
+// #define debug2(x, y) ;
+// #define debug3(x, y, z) ;
+// #define debug4(x, y, z, q) ;
+// #define debug5(x, y, z, r, t) ;
+// #define debug6(x, y, z, r, t, s) ;
+// #define debug7(x, y, z, r, t, s, u) ;
+// #define wait ;
+// #define derr(x) ;
+// #define derr2(x, y) ;
+// #define derr3(x, y, z) ;
+// #define derr4(x, y, z, q) ;
+// #define derr5(x, y, z, r, t) ;
+// #define derr6(x, y, z, r, t, s) ;
+// #define derr7(x, y, z, r, t, f, u) ;
+// #define checkpoint ;
+// #endif
 
 #define print_matrix(a, n, m) \
     REPE(0, n, 0, m) { cout << (a)[i][j] << ((j == m - 1) ? '\n' : ' '); }
@@ -172,11 +172,50 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo dp[4*1000000];
+void fun(lo mask, lo pen){
+    if(dp[mask]!=-1)return;
+    dp[mask] = pen;
+    REP(0, 20)if(CHECK_BIT(mask, i))fun(mask^(1<<i), pen);
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n, k;
+        memset(dp, -1, sizeof(dp));
+        cin>>n>>k;
+        string s;
+        cin>>s;
+        REP(0, k){
+            lo mask = 0;
+            string temp;
+            cin>>temp;
+            REPV(j, 0, temp.length())mask|=1<<(temp[j] - 'a');
+            fun(mask, i+1);
+            // debug2(temp, mask);
+        }
+        lo mask = 0;
+        lo prev = 0;
+        REP(0, n){
+            lo n_mask = mask|(1<<(s[i] - 'a'));
+            // debug2(mask, n_mask);
+            if(dp[n_mask] == -1){
+                // debug3(n_mask, i, prev);
+                REPV(j, prev, i)cout<<dp[mask]<<" ";
+                mask = 1<<(s[i] - 'a');
+                prev = i;
+            }
+            else mask = n_mask;
+        }
+        // if(prev != n){
+            REP(prev, n)cout<<dp[mask]<<" ";
+        cout<<endl;
+    }
     return 0;
 }

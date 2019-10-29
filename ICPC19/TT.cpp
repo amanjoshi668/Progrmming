@@ -172,11 +172,154 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+class SEGMENT_TREE
+{
+    lo n;
+    vl seg_tree;
+    vl lazy;
+    bool islazy;
+
+public:
+    SEGMENT_TREE(lo n, bool _islazy = true)
+    {
+        this->n = n;
+        this->islazy = _islazy;
+        seg_tree.resize(4 * (n + 1));
+        fill(all(seg_tree), 0LL);
+        if (this->islazy)
+        {
+            lazy.resize(4 * (n + 1));
+            fill(all(lazy), 0LL);
+        }
+    }
+    void reset(lo value = 0)
+    {
+        fill(all(seg_tree), value);
+        if (islazy)
+        {
+            fill(all(lazy), 0LL);
+        }
+    }
+    void build(lo node, lo start, lo end, vl &a)
+    {
+        if (start == end)
+        {
+            seg_tree[node] = a[node];
+        }
+        else
+        {
+            lo mid = (start + end) / 2;
+            build(2 * node + 1, start, mid, a);
+            build(2 * node + 2, mid + 1, end, a);
+            seg_tree[node] = max(seg_tree[node * 2 + 1] , seg_tree[node * 2 + 2];
+            return;
+        }
+    }
+    void update(lo node, lo start, lo end, lo l, lo r, lo val)
+    {
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] +=  lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start > end or start > r or end < l)
+            return;
+        if (start >= l and end <= r)
+        {
+            // Segment is fully within range
+            seg_tree[node] += val;
+            if (this->islazy)
+            {
+                if (start != end)
+                {
+                    // Not leaf node
+                    lazy[node * 2 + 1] += val;
+                    lazy[node * 2 + 2] += val;
+                }
+            }
+            return;
+        }
+        lo mid = (start + end) / 2;
+        update(node * 2 + 1, start, mid, l, r, val);                      // Updating left child
+        update(node * 2 + 2, mid + 1, end, l, r, val);                    // Updating right child
+        seg_tree[node] = seg_tree[node * 2 + 1] + seg_tree[node * 2 + 2]; // Updating root with max value
+    }
+    lo queryRange(lo node, lo start, lo end, lo l, lo r)
+    {
+        if (start > end or start > r or end < l)
+            return 0; // Out of range
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] += lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start >= l and end <= r)
+            return seg_tree[node];
+        lo mid = (start + end) / 2;
+        lo p1 = queryRange(node * 2 + 1, start, mid, l, r);   // Query left child
+        lo p2 = queryRange(node * 2 + 2, mid + 1, end, l, r); // Query right child
+        return (p1 + p2);
+    }
+    void update(lo l, lo r, lo val)
+    {
+        update(0, 0, n - 1, l, r, val);
+    }
+    void update(lo l, lo val)
+    {
+        update(l, l, val);
+    }
+    lo query(lo l, lo r)
+    {
+        return queryRange(0, 0, n - 1, l, r);
+    }
+};
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n, k;
+        cin>>n>>k;
+        vl a(n);
+        cin>>a;
+        vl index;
+        lo sum = 0;
+        REP(0, n){
+            sum+=a[i];
+            index.pb(a[i]);
+        }
+        sort(all(index));
+        map<lo, lo> M;
+        REP(0, n)M[a[i]] = i;
+        vl dp(n+1, 0);
+        lo sum = 0;
+        REP(0, n){
+            sum+=a[i];
+            lo x = M[sum];
+            
+        }
+    }
     return 0;
 }

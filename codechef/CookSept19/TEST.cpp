@@ -174,9 +174,59 @@ struct custom_hash
 };
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    cout.precision(20);
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
+    // cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n;
+        cin>>n;
+        vl a(n);
+        cin>>a;
+        bool less = false;
+        lo l = 0;
+        lo r = LONG_LONG_MAX;
+        if(a[0]!=-1){
+            l = r= a[0];
+        }
+        string s;
+        bool great = false;
+        cin>>s;
+        bool ans = true;
+        REP(0, s.length()){
+            if(s[i] == '='){
+                if(a[i+1] != -1)l = r = a[i+1];
+                continue;
+            }
+            else if(s[i] == '<'){
+                // lo tl= a[i], tr = a[i];
+                if(a[i+1] == -1){
+                    l++;
+                    r = LONG_LONG_MAX;
+                    if(r-l < 0)ans =false;
+                }
+                else{
+                    if(l >= a[i+1])ans = false;
+                    l = r = a[i+1];
+                }
+            }
+            else if(s[i] == '>'){
+                if(a[i+1] == -1){
+                    r--;
+                    l = 0;
+                    if(r-l < 0)ans =false;
+                }
+                else{
+                    if(r<=a[i+1])ans=false;
+                    l = r = a[i+1];
+                }
+            }
+            // debug3(i, l, r);
+        }
+        if(ans)cout<<"YES"<<endl;
+        else cout<<"NO"<<endl;
+    }
     return 0;
 }

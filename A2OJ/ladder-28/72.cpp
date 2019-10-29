@@ -28,7 +28,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -133,28 +133,6 @@ ostream &operator<<(ostream &o, map<T, U> v)
         o << it << " ";
     return o << endl;
 }
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
-}
 struct custom_hash
 {
     static uint64_t splitmix64(uint64_t x)
@@ -172,11 +150,20 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+lo sqrtt(lo n){
+    lo x = 0;
+    while(x * x < n)x++;
+    return x;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo r, x, y, xx, yy;
+    cin>>r>>x>>y>>xx>>yy;
+    auto t =  sqrtt((xx - x) * (xx - x) + (yy - y)*(yy - y));
+    cout<<(t+2*r-1)/(2*r)<<endl;
     return 0;
 }

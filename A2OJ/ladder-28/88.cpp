@@ -172,11 +172,48 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+void fun(string &res, lo num){
+    lo carry = 0;
+    // cerr<<res<<" "<<num<<endl;
+    REP(0, res.length()){
+        // cerr<<"#i="<<i<<endl;
+        lo x = res[i] - '0';
+        x*=num;
+        x+=carry;
+        res[i] = x%10 + '0';
+        carry = x/10;
+    }
+    // cerr<<"here"<<endl;
+    while(carry){
+        res.push_back(carry%10 + '0');
+        carry/=10;
+    }
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    vl prime(1000, true);
+    vl primes;
+    for(int i=2; i<1000; i++){
+        if(prime[i]){
+            for(int j = 2*i; j<1000; j+=i)
+                prime[j] = false;
+            primes.push_back(i);
+        }
+    } 
+    lo n;
+    // cerr<<primes.size()<<endl;
+    cin>>n;
+    string res = "2";
+    cout<<res<<endl;
+    REP(1, n){
+        fun(res, primes[i]);
+        string temp = res;
+        reverse(all(temp));
+        cout<<temp<<endl;
+    }
     return 0;
 }

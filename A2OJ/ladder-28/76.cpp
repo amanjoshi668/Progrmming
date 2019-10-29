@@ -178,5 +178,18 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, t, nn;
+    cin>>n;
+    nn = n;
+    vl p(n+1);
+    while(n>=0){
+        for(t =0; n>>t; t++);
+        t--;
+        lo x = (1<<(t+1))-1;
+        if(t>=0)for(lo i = 1<<t; i<=n; i++)p[i] = x-i, p[x-i] = i;
+        n = x - n - 1;
+    }
+    cout<<(nn*(nn + 1))<<endl;
+    cout<<p;
     return 0;
 }

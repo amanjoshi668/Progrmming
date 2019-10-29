@@ -35,7 +35,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define eps 1e-2
 #define PI acos(-1.0)
 
-#if _DEBUG
+// #if _DEBUG
 #define debug(x) cout << #x << "=" << x << endl
 #define debug2(x, y) cout << #x << "=" << x << " " << #y << "=" << y << endl;
 #define debug3(x, y, z) cout << #x << "=" << x << " " << #y << "=" << y << " " << #z << "=" << z << endl;
@@ -68,24 +68,24 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 lo checkpoint_counter=0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
-#else
-#define debug(x) ;
-#define debug2(x, y) ;
-#define debug3(x, y, z) ;
-#define debug4(x, y, z, q) ;
-#define debug5(x, y, z, r, t) ;
-#define debug6(x, y, z, r, t, s) ;
-#define debug7(x, y, z, r, t, s, u) ;
-#define wait ;
-#define derr(x) ;
-#define derr2(x, y) ;
-#define derr3(x, y, z) ;
-#define derr4(x, y, z, q) ;
-#define derr5(x, y, z, r, t) ;
-#define derr6(x, y, z, r, t, s) ;
-#define derr7(x, y, z, r, t, f, u) ;
-#define checkpoint ;
-#endif
+// #else
+// #define debug(x) ;
+// #define debug2(x, y) ;
+// #define debug3(x, y, z) ;
+// #define debug4(x, y, z, q) ;
+// #define debug5(x, y, z, r, t) ;
+// #define debug6(x, y, z, r, t, s) ;
+// #define debug7(x, y, z, r, t, s, u) ;
+// #define wait ;
+// #define derr(x) ;
+// #define derr2(x, y) ;
+// #define derr3(x, y, z) ;
+// #define derr4(x, y, z, q) ;
+// #define derr5(x, y, z, r, t) ;
+// #define derr6(x, y, z, r, t, s) ;
+// #define derr7(x, y, z, r, t, f, u) ;
+// #define checkpoint ;
+// #endif
 
 #define print_matrix(a, n, m) \
     REPE(0, n, 0, m) { cout << (a)[i][j] << ((j == m - 1) ? '\n' : ' '); }
@@ -172,11 +172,57 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+bool fun(vll a){
+    vll temp;
+    vl index;
+    TRV(a)index.pb(it.X), index.pb(it.Y);
+    sort(all(index));
+    // debug(a);
+    map<lo, lo> M;
+    REP(0, index.size())M[index[i]] = i;
+    TRV(a){
+        it.X = M[it.X];
+        it.Y=  M[it.Y];
+    }
+    // debug(a);
+    vl sum(index.size()+1, 0);
+    TRV(a){
+        sum[it.X]++;
+        sum[it.Y+1]--;
+    }
+    REP(1, sum.size()){
+        sum[i] += sum[i-1];
+        if(sum[i]>2)return false;
+    }
+    return true;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n;
+        cin>>n;
+        map<lo, vll> M;
+        REP(0, n){
+            lo x, y, v;
+            cin>>x>>y>>v;
+            if(present(M, v))M[v].pb(mp(x, y));
+            else {
+                M[v] = {{x, y}};
+            }
+        }
+        // debug(M);
+        bool ans = true;
+        TRV(M){
+            ans = ans and fun(it.Y);
+        }
+        if(ans)cout<<"YES"<<endl;
+        else cout<<"NO"<<endl;
+    }
     return 0;
 }

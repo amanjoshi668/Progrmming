@@ -178,5 +178,16 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, k;
+    cin>>n>>k;
+    vl a(n);
+    cin>>a;
+    sort(all(a));
+    set<lo> S;
+    TRV(a){
+        if(it%k!=0)S.insert(it);
+        else if(S.find(it/k) == S.end())S.insert(it);
+    }
+    cout<<S.size();
     return 0;
 }

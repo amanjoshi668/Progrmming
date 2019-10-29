@@ -28,7 +28,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -91,6 +91,8 @@ lo checkpoint_counter=0;
     REPE(0, n, 0, m) { cout << (a)[i][j] << ((j == m - 1) ? '\n' : ' '); }
 #define present(container, element) (container.find(element) != container.end())
 #define endl "\n"
+#define add(a) accumulate(all(a), lo(0));
+#define add(a, x) accumulate(all(a), x);
 template <typename T>
 ostream &operator<<(ostream &o, vector<T> v)
 {
@@ -133,28 +135,6 @@ ostream &operator<<(ostream &o, map<T, U> v)
         o << it << " ";
     return o << endl;
 }
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
-}
 struct custom_hash
 {
     static uint64_t splitmix64(uint64_t x)
@@ -178,5 +158,20 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    string a;
+    cin>>a;
+    lo n = a.length();
+    vl ans(n, 0);
+    vl last_char(26, -1);
+    REP(0, a.length()){
+        lo res = true;
+        REPV(j, 0, a[i] - 'a')if(last_char[j]!=-1)res = res and ans[last_char[j]];
+        last_char[a[i] - 'a'] = i;
+        ans[i] = res ^ 1;
+    }
+    REP(0, n){
+        if(!ans[i])cout<<"Mike"<<endl;
+        else cout<<"Ann"<<endl;
+    }
     return 0;
 }

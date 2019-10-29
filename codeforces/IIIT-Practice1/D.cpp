@@ -178,5 +178,16 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo t;
+    cin>>t;
+    while(t--){
+        lo n, x, y;
+        cin>>n>>x>>y;
+        bool ans = true;
+        if((n+1)/2 > x)ans = false;
+        if(n/2 > y)ans = false;
+        if(ans)cout<<"YES"<<endl;
+        else cout<<"NO"<<endl; 
+    }
     return 0;
 }

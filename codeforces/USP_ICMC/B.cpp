@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -28,7 +29,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,37 +124,15 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
-}
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
 }
 struct custom_hash
 {
@@ -178,5 +157,25 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo a, b;
+    lo x = LLONG_MAX;
+    cin >> a >> b;
+    vl ans;
+    for (lo i = 1; i * i <= a; i++)
+    {
+        if (a % i == 0)
+        {
+            if (i % b == 0)
+                ans.push_back(i);
+            if (i * i != a)
+            {
+                lo x = a / i;
+                if (x % b == 0)
+                    ans.push_back(x);
+            }
+        }
+    }
+    sort(all(ans));
+    cout<<ans;
     return 0;
 }

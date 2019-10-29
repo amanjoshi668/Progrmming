@@ -178,5 +178,43 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, k;
+    cin>>n>>k;
+    vl a(n);
+    cin>>a;
+    sort(all(a));
+    lo l = 0; 
+    lo r = n-1;
+    lo lc = 1;
+    lo rc = 1;
+    lo min_num = a[0];
+    lo max_num = a[1];
+    while(l<r and k>0){
+        if(lc < rc){
+            if(k >= (a[l+1] - a[l]) * lc){
+                k-=(a[l+1] - a[l]) * lc;
+                l++;
+                lc++;
+            }
+            else{
+                a[l] =  a[l] + (k / lc);
+                k = 0;
+            }
+        }
+        else{
+            if(k >= (a[r] - a[r-1]) * rc){
+                k-=(a[r] - a[r-1]) * rc;
+                r--;
+                rc++;
+            }
+            else{
+                a[r] =  a[r] - (k/lc);
+                k = 0;
+            }
+        }
+        min_num = a[l];
+        max_num = a[r];
+    }
+    cout<<max_num - min_num<<endl;
     return 0;
 }

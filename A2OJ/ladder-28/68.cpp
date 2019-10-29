@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -28,7 +29,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define TRV(a) for (auto &it : a)
 #define INF 500010
 #define MOD 1000000007
-#define MOD2 1000000009
+#define M 1000000007
 #define BLOCK 300
 #define CHECK_BIT(var, pos) ((var) & (1 << (pos)))
 #define pb(a) push_back((a))
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,37 +124,15 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
-}
-template <typename T>
-T &&vmin(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmin(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 < val2) ? vmin(val1, std::forward<Ts>(vs)...) : vmin(val2, std::forward<Ts>(vs)...);
-}
-template <typename T>
-T &&vmax(T &&val)
-{
-    return std::forward<T>(val);
-}
-
-template <typename T0, typename T1, typename... Ts>
-auto vmax(T0 &&val1, T1 &&val2, Ts &&... vs)
-{
-    return (val1 > val2) ? vmax(val1, std::forward<Ts>(vs)...) : vmax(val2, std::forward<Ts>(vs)...);
 }
 struct custom_hash
 {
@@ -172,11 +151,57 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+vl par(INF), sz(INF);
+vector<pair<lo, ll>> E;
+
+lo find(lo x)
+{
+    if (par[x] == x)
+        return x;
+    par[x] = find(par[x]);
+    return par[x];
+}
+void join(lo x, lo y)
+{
+    lo xp = find(x);
+    lo yp = find(y);
+    sz[xp] += sz[yp];
+    par[yp] = xp;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n, m;
+    cin >> n >> m;
+    vl a(n);
+    cin >> a;
+    REP(0, m)
+    {
+        lo u, v;
+        cin >> u >> v;
+        u--, v--;
+        E.push_back(mp(min(a[u], a[v]), mp(u, v)));
+    }
+    REP(0, n)
+    par[i] = i,
+    sz[i] = 1;
+    sort(all(E), greater<pair<lo, ll>>());
+    lo ans = 0;
+    TRV(E)
+    {
+        if (find(it.Y.X) == find(it.Y.Y))
+            continue;
+        debug3(it, sz[it.Y.X], sz[it.Y.Y]);
+        ans += sz[find(it.Y.X)] * sz[find(it.Y.Y)] * it.X;
+        join(it.Y.X, it.Y.Y);
+        // checkpoint;
+        // REP(0, 4)
+        //     cout << par[i] << " ";
+        // cout << endl;
+    }
+    cout << ld(ans * 2) / (n * (n - 1)) << endl;
     return 0;
 }

@@ -178,5 +178,23 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin>>n;
+    vvl a(n, vl(n, 0));
+    vvl answer;
+    REPE(0, n, 0, n){
+        if((i+j)%2 != n%2){
+            answer.push_back({1, i+1, j+1, 2});
+            a[i][j] = 1;
+        }
+    }
+    for(lo i=0;i<n-1; i++)for(lo j=0; j<n-1; j++)if(a[i][j] == 0){
+        answer.push_back({2, i+1, j+1, 1});
+        a[i][j] = 2;
+        a[i+1][j+1] = 2;
+    }
+    REPE(0, n, 0, n)if(!a[i][j])answer.push_back({1, i+1, j+1, 1});
+    cout<<answer.size()<<endl;
+    TRV(answer)cout<<it<<endl;
     return 0;
 }
