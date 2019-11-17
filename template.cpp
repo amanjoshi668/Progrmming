@@ -575,13 +575,13 @@ class SIEVE
 //////////////////////////////////////////////////////////////////////////suffix array lcp
 struct entry
 {
-    lo nr[2], p;
+    int nr[2], p;
 };
-vl cont(60000);
+vector<int> cont(60000);
 vector<entry> output(60000);
 void cont_sort(const vector<entry> &L, lo index)
 {
-    lo i;
+    int i;
     fill(all(cont), lo(0));
     for (i = 0; i < L.size(); ++i)
     {
@@ -595,15 +595,15 @@ void cont_sort(const vector<entry> &L, lo index)
         --cont[L[i].nr[index] + 1];
     }
 }
-pair<vl, vl> suffix_lcp_array(std ::string &A)
+pair<vector<int>, vector<int>> suffix_lcp_array(std ::string &A)
 {
-    lo n = A.length();
-    vl current(n);
-    vl prev(n);
+    int n = A.length();
+    vector<int> current(n);
+    vector<int> prev(n);
     vector<entry> L(n);
     lo i, stp, cnt;
-    REP(0, n)
-    prev[i] = int(A[i]);
+    for (int i = 0; i < n; i++)
+        prev[i] = int(A[i]);
     for (stp = 1, cnt = 1; cnt >> 1 < n; stp++, cnt <<= 1)
     {
         for (i = 0; i < n; i++)
@@ -613,21 +613,21 @@ pair<vl, vl> suffix_lcp_array(std ::string &A)
             L[i].p = i;
         }
         cont_sort(L, 1);
-        REP(0, L.size())
-        L[i] = output[i];
+        for (int i = 0; i < L.size(); i++)
+            L[i] = output[i];
         cont_sort(L, 0);
-        REP(0, L.size())
-        L[i] = output[i];
+        for (int i = 0; i < L.size(); i++)
+            L[i] = output[i];
         for (i = 0; i < n; i++)
             current[L[i].p] = i > 0 && L[i].nr[0] == L[i - 1].nr[0] && L[i].nr[1] == L[i - 1].nr[1] ? current[L[i - 1].p] : i;
         prev = current;
     }
-    vl sa = current;
-    lo k = 0;
-    vl lcp(n, 0);
-    vl ranks(n, 0);
-    REP(0, n)
-    ranks[sa[i]] = i;
+    vector<int> sa = current;
+    int k = 0;
+    vector<int> lcp(n, 0);
+    vector<int> ranks(n, 0);
+    for (int i = 0; i < n; i++)
+        ranks[sa[i]] = i;
     swap(ranks, sa);
     for (lo i = 0; i < n; i++)
     {
@@ -636,7 +636,7 @@ pair<vl, vl> suffix_lcp_array(std ::string &A)
             k = 0;
             continue;
         }
-        lo j = sa[ranks[i] + 1];
+        int j = sa[ranks[i] + 1];
         while (i + k < n && j + k < n && A[i + k] == A[j + k])
             k++;
         lcp[ranks[i]] = k;

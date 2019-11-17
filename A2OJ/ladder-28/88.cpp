@@ -18,8 +18,9 @@ typedef vector<vl> vvl; //vector of vectors
 #define Y second
 #define mp(a, b) make_pair((a), (b))
 #define REP(a, b) for (lo i = (a); i < (lo)b; i++) //no need to declare variable i
-#define REPE(a, b, c, d) REP(a, b) \
-for (lo j = (c); j < (lo)d; j++)                        //no need to declare vaiables i,j
+#define REPE(a, b, c, d) \
+    REP(a, b)            \
+    for (lo j = (c); j < (lo)d; j++)                    //no need to declare vaiables i,j
 #define REPV(a, b, c) for (lo(a) = b; (a) < (c); (a)++) //a is the variable
 #define IREP(a, b) for (lo i = (a); i >= (b); i--)
 #define IREPV(a, b, c) for (lo(a) = b; (a) >= (c); (a)--)
@@ -65,7 +66,7 @@ for (lo j = (c); j < (lo)d; j++)                        //no need to declare vai
 #define derr7(o, p, x, y, z, w, t) \
     cerr << #o << " " << o << " "; \
     derr6(p, x, y, z, w, t);
-lo checkpoint_counter=0;
+lo checkpoint_counter = 0;
 #define checkpoint cerr << "At checkpoint : " << checkpoint_counter++ << endl;
 
 #else
@@ -123,14 +124,14 @@ template <typename T>
 ostream &operator<<(ostream &o, set<T> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T, typename U>
 ostream &operator<<(ostream &o, map<T, U> v)
 {
     TRV(v)
-        o << it << " ";
+    o << it << " ";
     return o << endl;
 }
 template <typename T>
@@ -172,22 +173,30 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-void fun(string &res, lo num){
+void fun(string &res, lo num)
+{
     lo carry = 0;
     // cerr<<res<<" "<<num<<endl;
-    REP(0, res.length()){
+    REP(0, res.length())
+    {
         // cerr<<"#i="<<i<<endl;
         lo x = res[i] - '0';
-        x*=num;
-        x+=carry;
-        res[i] = x%10 + '0';
-        carry = x/10;
+        x *= num;
+        x += carry;
+        res[i] = x % 10 + '0';
+        carry = x / 10;
     }
     // cerr<<"here"<<endl;
-    while(carry){
-        res.push_back(carry%10 + '0');
-        carry/=10;
+    while (carry)
+    {
+        res.push_back(carry % 10 + '0');
+        carry /= 10;
     }
+}
+void Fail()
+{
+    cout << "-1" << endl;
+    exit(0);
 }
 int main(int argc, char *argv[])
 {
@@ -197,23 +206,33 @@ int main(int argc, char *argv[])
     cout.precision(20);
     vl prime(1000, true);
     vl primes;
-    for(int i=2; i<1000; i++){
-        if(prime[i]){
-            for(int j = 2*i; j<1000; j+=i)
+    for (int i = 2; i < 1000; i++)
+    {
+        if (prime[i])
+        {
+            for (int j = 2 * i; j < 1000; j += i)
                 prime[j] = false;
             primes.push_back(i);
         }
-    } 
+    }
     lo n;
     // cerr<<primes.size()<<endl;
-    cin>>n;
-    string res = "2";
-    cout<<res<<endl;
-    REP(1, n){
-        fun(res, primes[i]);
+    cin >> n;
+    if (n == 2)
+        Fail();
+    // string res = "2";
+    // cout<<res<<endl;
+    REPV(j, 0, n)
+    {
+        string res = "1";
+        REP(0, n)
+        if (i != j)
+        {
+            fun(res, primes[i]);
+        }
         string temp = res;
         reverse(all(temp));
-        cout<<temp<<endl;
+        cout << temp << endl;
     }
     return 0;
 }
