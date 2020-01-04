@@ -1230,26 +1230,3 @@ maximum matching.
 length of the longest chain.
 
 */
-1D-1D Optimizaton :
-
-dp[i] = min
-k<i
-(dp[k] + cost[k][i])
-
-If cost satifies quadrangle inequality, Best[i] <= Best[i + 1]. Hence, for each i see for what
-all j>i, i could be the Best[j] using binary search. Store the beginning of each segment in a
-vector. Whenever we consider a new value of i, perform the following to update the segments:
-∙ While the new value of i is better than the value at the back of the vector, pop the back.
-∙ Binary search in the current segment to find the turning point, and push this value of i
-together with the turning point onto the back of the vector.
-
-Knuth’s Optimization
-
-dp[i][j] = min
-i<k<j
-(dp[i][k − 1] + dp[k + 1][j]) + cost[i][j]
-
-If cost satisfies quadrangle inequality and it is monotonic, then Best[i][j −1] <= Best[i][j] <=
-
-Best[i][j+1]. So, build the dp over length (j=i+len) and for dp[i][j] traverse only from Best[i][j-
-1] to Best[i][j+1]. Reduces O(N3) to O(N2)
