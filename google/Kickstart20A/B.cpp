@@ -173,49 +173,39 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        lo n, K, P;
+        cin >> n >> K >> P;
+        vvl a(n, (vl(K)));
+        cin >> a;
+        lo dp[n + 1][P + 1];
+        memset(dp, 0, sizeof(dp));
+        REP(0, n)
+        {
+            REPV(p, 0, P + 1)
+            {
+                lo sum = 0;
+                REPV(k, 0, K + 1)
+                {
+                    if (p + k <= P)
+                    {
+                        dp[i + 1][p + k] = max(dp[i + 1][p + k], dp[i][p] + sum);
+                    }
+                    if (k < K)
+                        sum += a[i][k];
+                }
+            }
         }
-        cout << res <<endl;
+        cout << "Case #" << t << ": " << dp[n][P] << endl;
     }
     return 0;
 }

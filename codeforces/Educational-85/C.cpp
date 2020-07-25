@@ -173,22 +173,6 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
@@ -197,25 +181,19 @@ int main(int argc, char *argv[])
     cout.precision(20);
     lo t;
     cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
+    while(t--){
         lo n;
         cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        vll a(n);
+        cin >> a;
+        lo sum = max(0LL, a[0].first - a.back().second);
+        REP(1, n)
+            sum += max(0LL, a[i].first - a[i-1].second);
+        lo res = sum + a[0].first - max(0LL, a[0].first - a.back().second);
+        REP(1, n){
+            res = min(res, sum + a[i].first - max(0LL, a[i].first - a[i-1].second));
         }
-        cout << res <<endl;
+        cout << res << endl;
     }
     return 0;
 }

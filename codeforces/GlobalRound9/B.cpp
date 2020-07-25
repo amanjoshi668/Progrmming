@@ -197,25 +197,34 @@ int main(int argc, char *argv[])
     cout.precision(20);
     lo t;
     cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+    while(t--){
+        lo n, m;
+        cin >> n >> m;
+        vvl A(n, vl(m, 0));
+        cin >> A;
+        bool valid = true;
+        if(A[0][0] > 2 or A[0][m-1] > 2 or A[n-1][0] > 2 or A[n-1][m-1] > 2)
+            valid = false;
+        REP(0, n){
+            if(A[i][0] > 3 or A[i][m-1] > 3)
+                valid = false;
         }
-        cout << res <<endl;
+        REP(0, m){
+            if(A[0][i] > 3 or A[n-1][i] > 3)
+                valid = false;
+        }
+        REPE(0,n, 0, m)if(A[i][j] > 4)valid = false;
+        if(!valid){
+            cout << "NO" << endl;
+            continue;
+        }
+        cout << "YES" << endl;
+        REPE(0, n, 0, m){
+            if(i == 0 or j == 0 or i == n-1 or j == m-1)cout << 3;
+            else cout << 4;
+            if( j== m-1)cout << endl;
+            else cout << " ";
+        }
     }
     return 0;
 }

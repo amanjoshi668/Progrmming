@@ -173,49 +173,22 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    set<lo> S;
+    REP(1, 200)if(!S.count(i)){
+        int x = i;
+        S.insert(x);
+        int y = i+1;
+        while(S.count(y) or S.count(y^x))
+            y++;
+        S.insert(y);
+        S.insert(y^x);
+        cout << x << "\t" << bitset<8>(x) << "\t "<<min(y, x^y) << "\t " << bitset<8>(min(y, x^y)) << "\t "<<max(y, x^y) << "\t " <<bitset<8>(max(x, x^y)) <<" \t" <<(2*x - min(y, x^y) )<<endl; 
     }
     return 0;
 }

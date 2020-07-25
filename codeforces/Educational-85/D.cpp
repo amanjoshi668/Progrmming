@@ -173,21 +173,24 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+lo n;
+void fun(int index, int l, lo r)
 {
-    lo res = 1;
-    while (n > 0)
+    // debug3(index, l, r);
+    if (index == n and r == 0)
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        cout << 1;
+        return;
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+    auto t = 2 * (n - index);
+    // if(index == 1)t = 1;
+    for (int i = l; i < min(t, r + 1); i++)
+    {
+        if (i % 2 == 0)
+            cout << index << " ";
+        else
+            cout << ((i + 1) / 2) + index << " ";
+    }
 }
 int main(int argc, char *argv[])
 {
@@ -197,25 +200,32 @@ int main(int argc, char *argv[])
     cout.precision(20);
     lo t;
     cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
     while (t--)
     {
-        lo n;
         cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        lo l, r;
+        cin >> l >> r;
+        vl a(n + 1, 1);
+        a[0] = 0;
+        REP(1, n)
+        a[i] = 2 * (n - i);
+        a[n] = 1;
+        REP(1, n + 1)
+        a[i] += a[i - 1];
+        lo index = lower_bound(all(a), l) - a.begin();
+        // debug(a);
+        // debug2(a.back(), index);
+        auto prev = l;
+        while (a[index - 1] <= r)
+        {
+            fun(index, prev - a[index - 1] - 1, r - a[index - 1] - 1);
+            prev = a[index] + 1;
+            index++;
+            if (index > n)
+                break;
         }
-        cout << res <<endl;
+        cout << endl;
     }
     return 0;
 }
+

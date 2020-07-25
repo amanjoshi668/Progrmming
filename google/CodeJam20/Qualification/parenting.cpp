@@ -173,49 +173,46 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        lo N;
+        cin >> N;
+        vector<pair<ll, lo>> A(N);
+        REP(0, N)
+        {
+            cin >> A[i].first;
+            A[i].second = i;
         }
-        cout << res <<endl;
+        sort(A.begin(), A.end());
+        bool possible = true;
+        int james = -1;
+        int cameron = -1;
+        string res = string(N, 'C');
+        for (auto element : A)
+        {
+            auto activity = element.first;
+            auto index = element.second;
+            if (james == -1 or james <= activity.first)
+                james = activity.second, res[index] = 'J';
+            else if (cameron == -1 or cameron <= activity.first)
+                cameron = activity.second, res[index] = 'C';
+            else
+                possible = false;
+        }
+
+        cout << "Case #" << t << ": ";
+        if (possible)
+            cout << res << endl;
+        else
+            cout << "IMPOSSIBLE" << endl;
     }
     return 0;
 }

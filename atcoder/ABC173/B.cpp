@@ -195,27 +195,39 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    map<string, int> M;
+    lo n;
+    cin >> n;
+    while (n--)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+        string s;
+        cin >> s;
+        M[s]++;
     }
+    cout << "AC x ";
+    if (M.count("AC"))
+        cout << M["AC"];
+    else
+        cout << 0;
+    cout << endl;
+    cout << "WA x ";
+    if (M.count("WA"))
+        cout << M["WA"];
+    else
+        cout << 0;
+    cout << endl;
+    cout << "TLE x ";
+    if (M.count("TLE"))
+        cout << M["TLE"];
+    else
+        cout << 0;
+    cout << endl;
+    cout << "RE x ";
+    if (M.count("RE"))
+        cout << M["RE"];
+    else
+        cout << 0;
+    cout << endl;
     return 0;
 }
+

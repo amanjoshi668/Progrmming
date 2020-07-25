@@ -195,27 +195,59 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo n, k;
+    cin >> n >> k;
+    bool other = false;
+    vl A, B;
+    REP(0, n){
+        lo x;
+        cin >> x;
+        if(x > 0)A.push_back(x);
+        else B.push_back(-x);
     }
+    sort(all(A));
+    sort(all(B));
+    reverse(all(A));
+    reverse(all(B));
+    lo res = 1;
+    lo i = 0; lo j = 0;
+    while(k>=2){
+        if(i < A.size() - 1 or j < B.size() - 1)
+            break;
+        if(A[i] * A[i+1] > B[i] * B[i+1]){
+            i+=2;
+            k-=2;
+            res *= (A[i] * A[i+1])%MOD;
+            res %= MOD;
+        }
+        else{
+            j+=2;
+            k-=2;
+            res *= (A[i] * A[i+1])%MOD;
+            res %= MOD;
+        }
+    }
+    debug3(i, j, k);
+    if(k){
+        if(j < B.size() - 1 and k >= 2){
+            res = res * (B[j] * B[j+1]) % MOD;
+            res %= MOD;
+            j += 2;
+            k -= 2;
+        }
+        if(i < A.size()){
+            while(k > 0 and i < A.size()){
+                res = (res * A[i]) %MOD;
+                i++;
+                k--;
+            }
+        }
+        debug3(j, k, res);
+        if(k){
+            res = (res * B[j])%MOD;
+            res = MOD - res;
+        }
+    }
+    cout << res << endl;
     return 0;
 }

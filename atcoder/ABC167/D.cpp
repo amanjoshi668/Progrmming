@@ -173,49 +173,48 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo n;
+    cin >> n;
+    lo k;
+    cin >> k;
+    vl A(n+1);
+    REP(1, n+1)cin >> A[i];
+    lo num = 0;
+    set<lo> S;
+    lo current = 1;
+    vl t;
+    lo start = 1;
+    while(true){
+        derr(current);
+        start = current;
+        if(S.count(current))
+            break;
+        S.insert(current);
+        t.push_back(current);
+        current = A[current];
     }
+    vl p;
+    debug(t);
+    if(k < t.size()){
+        cout << t[k];
+        return 0;
+    }
+    bool e = false;
+    REP(0, t.size()){
+        if(t[i] == start)
+            e = true;
+        if(e)p.push_back(t[i]);
+    }
+    k -= t.size();
+    k %= p.size();
+    debug(p);
+    debug(k%p.size());
+    cout << p[k];
     return 0;
 }

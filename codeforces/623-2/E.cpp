@@ -1,3 +1,4 @@
+//https://codeforces.com/contest/1352/problem/A
 #include <bits/stdc++.h>
 #include <unistd.h>
 //#include <ext/pb_ds/assoc_container.hpp> // Common file
@@ -27,7 +28,7 @@ typedef vector<vl> vvl; //vector of vectors
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define all(v) (v).begin(), (v).end()
 #define TRV(a) for (auto &it : a)
-#define INF 500010
+#define INF 1000010
 #define MOD 1000000007
 #define MOD2 1000000009
 #define BLOCK 300
@@ -179,6 +180,17 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
+    lo n;
+    cin >> n;
+    vl a(n);
+    cin >> a;
+    vector<bool> prime(INF, true);
+    for(int i =2; i<=n; i++)if(prime[i])
+        for(int j = 2*i; j<=n; j+=i)
+            prime[j] = false;
+    vl primes;
+    REP(2, INF)if(prime[i])
+        primes.push_back(i);
     
     return 0;
 }

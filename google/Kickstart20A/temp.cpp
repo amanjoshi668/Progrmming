@@ -173,49 +173,134 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+lo K;
+struct node
 {
-    lo res = 1;
-    while (n > 0)
+    node *p[26];
+    int count;
+    int depth;
+    set<lo> index;
+    ll max_child;
+    node()
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        count = 0;
+        depth = 0;
+        max_child = {-1, -1};
+        memset(p, 0, sizeof(p));
     }
-    return res;
-}
-lo inv(lo n)
+};
+
+class trie
 {
-    return Pow(n, MOD - 2);
-}
+public:
+    node *root;
+    trie()
+    {
+        root = new node();
+    }
+
+    void insert(node *n, const char *s, int i, int in)
+    {
+        int length = strlen(s);
+        if (length == i){
+            n->depth = i;
+            n->count ++;
+            n->index.insert(in);
+            if(n->count == K)
+                n->max_child = {-1, i};
+            return ;
+        }
+        if (n->p[s[i] - 'A'] == NULL)
+        {
+            n->p[s[i] - 'A'] = new node();
+        }
+        n->depth = i;
+        auto c = n->p[s[i] - 'A'];
+        n->count++;
+        n->index.insert(in);
+        if (n->count == K)
+        {
+            n->max_child = {-1, i};
+        }
+        insert(c, s, i + 1, in);
+        if (c->max_child.second > n->max_child.second)
+            n->max_child = {s[i] - 'A', c->max_child.second};
+        return;
+    }
+
+    void del(node *n, const char *s, int i, int in)
+    {
+        int length = strlen(s);
+        if (length == i)if (length == i){
+            n->index.erase(in);
+            if(n->count == K)
+                n->max_child = {-1, -1};
+            n->count --;
+            return ;
+        }
+        auto c = n->p[s[i] - 'A'];
+        n->index.erase(in);
+        if (n->count == K)
+        {
+            n->max_child = {-1, -1};
+        }
+        n->count--;
+        del(c, s, i + 1, in);
+        if(n->max_child.first == s[i] - 'A')
+            n->max_child = {s[i] - 'A', c->max_child.second};
+        REP(0, 26)
+        if (n->p[i]) if (n->p[i]->max_child.second > n->max_child.second)
+            n->max_child = {i, n->p[i]->max_child.second};
+        if(n->max_child.second == -1 and n->count >= K)
+            n->max_child = {-1, n->depth};
+        return;
+    }
+
+    pair<int, set<lo>> findSet(node *n)
+    {
+        derr2(n->depth, n->max_child);
+        if (n->max_child.first == -1)
+            return {n->depth, n->index};
+        return findSet(n->p[n->max_child.first]);
+    }
+};
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
-    cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
+    // cout.precision(20);
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
         lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        cin >> n >> K;
+        vector<string> S;
+        trie Tr;
+        REP(0, n)
+        {
+            string s;
+            cin >> s;
+            S.push_back(s);
+            Tr.insert(Tr.root, s.c_str(), 0, i);
         }
-        cout << res <<endl;
+        auto ans = 0;
+        REP(0, n / K)
+        {
+            auto res = Tr.findSet(Tr.root);
+            derr2(i, res);
+            ans += res.first;
+            lo counter = 0;
+            TRV(res.second)
+            {
+                if (counter == K)
+                    break;
+                Tr.del(Tr.root, S[it].c_str(), 0, it);
+                counter++;
+            }
+        }
+        cout << "Case #" << t << ": " << ans << endl;
     }
     return 0;
 }

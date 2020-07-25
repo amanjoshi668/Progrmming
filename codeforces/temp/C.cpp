@@ -171,23 +171,16 @@ struct custom_hash
     {
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
+  
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+lo fun(lo n){
+    lo x = 0;
+    while(n>0){
+        x++;
+        n/=2;
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+    return x;
 }
 int main(int argc, char *argv[])
 {
@@ -197,25 +190,22 @@ int main(int argc, char *argv[])
     cout.precision(20);
     lo t;
     cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
+    while(t--){
         lo n;
         cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        vl a(n);
+        cin >> a;
+        lo res = 0;
+        lo prev = 0;
+        REP(1, n){
+            lo diff = a[i-1] - a[i];
+            if(diff > 0){
+                res = max(res, fun(diff));
+                a[i] = a[i-1];
+            }
         }
-        cout << res <<endl;
+        cout << res << endl;
+
     }
     return 0;
 }

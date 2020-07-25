@@ -173,21 +173,70 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+void solve()
 {
-    lo res = 1;
-    while (n > 0)
+    lo n, d;
+    cin >> n >> d;
+    vl a(n);
+    cin >> a;
+    sort(all(a));
+    lo res = d;
+    REP(0, n)
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        lo x = a[i];
+        REPV(T, 1, d + 1)
+        {
+            lo t = 0;
+            vl cut(d + 1, 0);
+            lo extra = 0;
+            lo add = 0;
+            REPV(j, 0, n)
+            {
+                if ((a[j] * T) % x == 0)
+                {
+                    if ((a[j] * T) / x <= d){
+                        cut[(a[j] * T) / x]++;
+                        add+=(a[j] * T) / x;
+                    }
+                    else
+                    {
+                        extra += (a[j] * T) / x;
+                    }
+                }
+                else
+                {
+                    extra += (a[j] * T) / x;
+                }
+                if(add > d)
+                    break;
+            }
+            t = 0;
+            lo cr = 0;
+            lo index = 1;
+            while (t < d)
+            {
+                while (cut[index]--)
+                {
+                    cr += min(d - t, index - 1);
+                    t += index;
+                    if (t >= d)
+                        break;
+                }
+                index++;
+                if (index == cut.size())
+                    break;
+            }
+            if (t < d)
+                if (extra >= d - t)
+                {
+                    cr += d - t;
+                    t = d;
+                }
+            if (t >= d)
+                res = min(res, cr);
+        }
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+    cout << res << endl;
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +244,32 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+        cout << "Case #" << t << ": ";
+        solve();
     }
     return 0;
 }
+
+/*
+8
+1 3
+1
+5 2
+10 5 359999999999 123456789 10
+2 3
+8 4
+3 2
+1 2 3
+1 3
+1
+5 2
+10 5 359999999999 123456789 10
+2 3
+8 4
+3 2
+1 2 3
+*/

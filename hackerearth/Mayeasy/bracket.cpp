@@ -173,49 +173,171 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+class SEGMENT_TREE
 {
-    lo res = 1;
-    while (n > 0)
+    lo n;
+    vl seg_tree;
+    vl lazy;
+    bool islazy;
+
+public:
+    SEGMENT_TREE(lo n, bool _islazy = true)
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        this->n = n;
+        this->islazy = _islazy;
+        seg_tree.resize(4 * (n + 1));
+        fill(all(seg_tree), 0LL);
+        if (this->islazy)
+        {
+            lazy.resize(4 * (n + 1));
+            fill(all(lazy), 0LL);
+        }
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
+    void reset(lo value = 0)
+    {
+        fill(all(seg_tree), value);
+        if (islazy)
+        {
+            fill(all(lazy), 0LL);
+        }
+    }
+    void build(lo node, lo start, lo end, vl &a)
+    {
+        if (start == end)
+        {
+            seg_tree[node] = a[node];
+        }
+        else
+        {
+            lo mid = (start + end) / 2;
+            build(2 * node + 1, start, mid, a);
+            build(2 * node + 2, mid + 1, end, a);
+            seg_tree[node] = min(seg_tree[node * 2 + 1] , seg_tree[node * 2 + 2]);
+            return;
+        }
+    }
+    void update(lo node, lo start, lo end, lo l, lo r, lo val)
+    {
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start > end or start > r or end < l)
+            return;
+        if (start >= l and end <= r)
+        {
+            // Segment is fully within range
+            seg_tree[node] += (end - start + 1) * val;
+            if (this->islazy)
+            {
+                if (start != end)
+                {
+                    // Not leaf node
+                    lazy[node * 2 + 1] += val;
+                    lazy[node * 2 + 2] += val;
+                }
+            }
+            return;
+        }
+        lo mid = (start + end) / 2;
+        update(node * 2 + 1, start, mid, l, r, val);                      // Updating left child
+        update(node * 2 + 2, mid + 1, end, l, r, val);                    // Updating right child
+        seg_tree[node] = min(seg_tree[node * 2 + 1], seg_tree[node * 2 + 2]); // Updating root with max value
+    }
+    lo queryRange(lo node, lo start, lo end, lo l, lo r)
+    {
+        if (start > end or start > r or end < l)
+            return LLONG_MAX; // Out of range
+        if (this->islazy)
+        {
+            if (lazy[node] != 0)
+            {
+                // This node needs to be updated
+                seg_tree[node] += (end - start + 1) * lazy[node]; // Update it
+                if (start != end)
+                {
+                    lazy[node * 2 + 1] += lazy[node]; // Mark child as lazy
+                    lazy[node * 2 + 2] += lazy[node]; // Mark child as lazy
+                }
+                lazy[node] = 0; // Reset it
+            }
+        }
+        if (start >= l and end <= r)
+            return seg_tree[node];
+        lo mid = (start + end) / 2;
+        lo p1 = queryRange(node * 2 + 1, start, mid, l, r);   // Query left child
+        lo p2 = queryRange(node * 2 + 2, mid + 1, end, l, r); // Query right child
+        return min(p1, p2);
+    }
+    void update(lo l, lo r, lo val)
+    {
+        update(0, 0, n - 1, l, r, val);
+    }
+    void update(lo l, lo val)
+    {
+        update(l, l, val);
+    }
+    lo query(lo l, lo r)
+    {
+        return queryRange(0, 0, n - 1, l, r);
+    }
+};
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    string s;
+    cin >> s;
+    lo n = s.length();
+    s += s;
+    lo res = 0;
+    int cur = 0;
+    SEGMENT_TREE tree(s.length()+1);
+    REP(0, n){
+        if(s[i]=='(')
+            cur++;
+        else 
+            cur--;
+        tree.update(i, cur);
     }
+    REP(0, n)
+
+        debug(tree.query(i, i));
+    REP(0, n){
+        debug2(i,tree.query(i, i+n-1)); 
+        if(tree.query(i, i+n-1) == 0)
+            res++;
+        if(s[i] == '(')
+            tree.update(i, i+n-1, -1);
+        else
+        {
+            tree.update(i, i+n-1, 1);
+        }
+        REP(0, n)
+    
+        debug(tree.query(i, i));
+        cur = tree.query(i+n-1, i+n-1);
+        debug(cur);
+        if(s[i+n]=='(')
+            cur++;
+        else
+        {
+            cur--;
+        }
+        tree.update(i+n, cur);
+    }
+    cout << res;
     return 0;
 }

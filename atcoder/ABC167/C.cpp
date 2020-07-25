@@ -173,49 +173,37 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo n, m, x;
+    cin >> n >> m >> x;
+    lo res = LLONG_MAX;
+    vl c(n);
+    lo A[n][m];
+    REP(0, n){
+        cin >> c[i];
+        REPV(j, 0, m)cin >> A[i][j];
     }
+    REP(0, (1<<n)){
+        vl learn(m, 0);
+        lo cost = 0;
+        REPV(j, 0, n)if(i&(1<<j)){
+            cost += c[j];
+            REPV(k, 0, m)
+                learn[k] += A[j][k];
+        }
+        bool valid = true;
+        REPV(j, 0, m)if(learn[j] < x)
+            valid = false;
+        if(valid)
+            res = min(res, cost);
+    }
+    if(res == LLONG_MAX)
+        res = -1;
+    cout << res << endl;
     return 0;
 }

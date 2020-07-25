@@ -173,21 +173,15 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+bool fun(vl &a, lo k, lo dis)
 {
-    lo res = 1;
-    while (n > 0)
+    lo used = 0;
+    REP(0, a.size() - 1)
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        lo diff = a[i + 1] - a[i] - 1;
+        used += diff / dis;
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+    return used <= k;
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +189,27 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        lo n, k;
+        cin >> n >> k;
+        vl a(n);
+        cin >> a;
+        lo low = 1;
+        lo high = 1e9;
+        lo res = LLONG_MAX;
+        while (low <= high)
+        {
+            lo mid = (low + high) / 2;
+            // debug2(mid, fun(a, k, mid));
+            if (fun(a, k, mid))
+                res = min(res, mid), high = mid - 1;
+            else
+                low = mid + 1;
         }
-        cout << res <<endl;
+        cout << "Case #" << t << ": " << res << endl;
     }
     return 0;
 }

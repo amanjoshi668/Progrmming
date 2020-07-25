@@ -173,21 +173,22 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+vvl G;
+vl visited, blocked;
+lo city;
+void dfs(lo node)
 {
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+    debug(node);
+    visited[node] = true;
+    city++;
+    if (blocked[node]){
+        visited[node] = false;
+        return;
     }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+        // return;
+    TRV(G[node])
+    if (!visited[it])
+        dfs(it);
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +196,34 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo n;
+    cin >> n;
+    G.resize(n + 1);
+    blocked.resize(n + 1, false);
+    visited.resize(n + 1, false);
+    REP(1, n)
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+        lo u, v;
+        cin >> u >> v;
+        G[u].push_back(v);
+        G[v].push_back(u);
     }
+    REP(1, n + 1)
+    {
+        lo x;
+        cin >> x;
+        if (x)
+            blocked[i]++;
+    }
+    city = 0;
+    lo res = 0;
+    REP(1, n + 1)
+    {
+        if (!visited[i])
+            dfs(i);
+        res = max(res, city);
+        city = 0;
+    }
+    cout << res << endl;
     return 0;
 }

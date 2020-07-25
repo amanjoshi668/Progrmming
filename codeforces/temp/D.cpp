@@ -173,21 +173,31 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+vvl G;
+int max_res = 0;
+int super_par ;
+void max_dfs(int node, int par){
+    bool add = false;
+    TRV(G[node])
+        if(it != par){
+            if(G[it].size() != 1)
+                max_res++;
+            if(G[it].size() == 1)
+                add = true;
+            max_dfs(it, node);
+        }
+    if(add and par != super_par)
+        max_res ++;
+}
+int min_res = 0;
+bool min_dfs(int node, int par, int val){
+    auto res = true;
+    TRV(G[node])if(it!=par){
+        if(G[it].size() == 1 and val == 0)
+            return false;
+        res = res and min_dfs(it, node, val^1);
     }
     return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +205,27 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo n;
+    cin >> n;
+    G.resize(n);
+    lo leaf = 0;
+    REP(1, n){
+        lo u, v;
+        cin >> u >> v;u--,v--;
+        G[u].pb(v);
+        G[v].pb(u);
     }
+    REP(0, n)if(G[i].size() == 1)leaf = i;
+    super_par = leaf;
+    max_dfs(G[leaf][0], -1);
+    // cout << max_res << endl;
+    if(min_dfs(leaf, -1, 0))
+        cout << 1 << " ";
+    else
+    {
+        cout << 3 << " ";
+    }
+    cout << max_res << endl;
+    
     return 0;
 }

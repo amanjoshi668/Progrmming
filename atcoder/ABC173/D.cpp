@@ -189,33 +189,34 @@ lo inv(lo n)
 {
     return Pow(n, MOD - 2);
 }
+ll sff(ll a){
+    if(a.first > a.second)
+        swap(a.first, a.second);
+    return a;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo n;
+    cin >> n;
+    vl A(n);
+    cin >> A;
+    sort(all(A));
+    reverse(all(A));
+    lo res = 0;
+    multiset<ll> S;
+    S.insert({A[0], A[0]});
+    REP(1, n){
+        auto x = *S.begin();
+        debug(x);
+        S.erase(S.begin());
+        res += x.first;
+        S.insert(sff(make_pair(x.first, A[i])));
+        S.insert(sff(make_pair(x.second, A[i])));
     }
+    cout << res << endl;
     return 0;
 }

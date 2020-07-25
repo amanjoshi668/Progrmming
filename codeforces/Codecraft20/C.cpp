@@ -6,7 +6,7 @@
 #include <cassert>
 using namespace std;
 //using namespace __gnu_pbds;
-typedef long long lo;
+typedef long lo;
 typedef long double ld;
 #include <ctime>
 typedef pair<lo, lo> ll; //pair
@@ -173,49 +173,119 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
+class FFT
 {
-    lo res = 1;
-    while (n > 0)
+    typedef complex<double> base;
+    public:
+    void fft(vector<base> &a, bool invert)
     {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+        lo n = (lo)a.size();
+
+        for (lo i = 1, j = 0; i < n; ++i)
+        {
+            lo bit = n >> 1;
+            for (; j >= bit; bit >>= 1)
+                j -= bit;
+            j += bit;
+            if (i < j)
+                swap(a[i], a[j]);
+        }
+
+        for (lo len = 2; len <= n; len <<= 1)
+        {
+            double ang = 2 * PI / len * (invert ? -1 : 1);
+            base wlen(cos(ang), sin(ang));
+            for (lo i = 0; i < n; i += len)
+            {
+                base w(1);
+                for (lo j = 0; j < len / 2; ++j)
+                {
+                    base u = a[i + j], v = a[i + j + len / 2] * w;
+                    a[i + j] = u + v;
+                    a[i + j + len / 2] = u - v;
+                    w *= wlen;
+                }
+            }
+        }
+        if (invert)
+            for (lo i = 0; i < n; ++i)
+                a[i] /= n;
     }
-    return res;
-}
-lo inv(lo n)
+    vl mult(vl &a, vl &b)
+    {
+        //cout << a.size() << "%" << b.size() << endl;
+        vector<base> fa(a.begin(), a.end()), fb(b.begin(), b.end());
+        size_t n = 1;
+        while (n < max(a.size(), b.size()))
+            n <<= 1;
+        n <<= 1;
+        //cout << a.size() << " " << b.size() << endl;
+        fa.resize(n), fb.resize(n);
+        fft(fa, false), fft(fb, false);
+        for (size_t i = 0; i < n; ++i)
+            fa[i] *= fb[i];
+        fft(fa, true);
+        vl res;
+        res.resize(n);
+        for (size_t i = 0; i < n; ++i)
+            res[i] = int(fa[i].real() + 0.5);
+        return res;
+    }
+};
+static char stdinBuffer[1024];
+static char* stdinDataEnd = stdinBuffer + sizeof (stdinBuffer);
+static const char* stdinPos = stdinDataEnd;
+
+void readAhead(size_t amount)
 {
-    return Pow(n, MOD - 2);
+    size_t remaining = stdinDataEnd - stdinPos;
+    if (remaining < amount) {
+       memmove(stdinBuffer, stdinPos, remaining);
+       size_t sz = fread(stdinBuffer + remaining, 1, sizeof (stdinBuffer) - remaining, stdin);
+       stdinPos = stdinBuffer;
+       stdinDataEnd = stdinBuffer + remaining + sz;
+       if (stdinDataEnd != stdinBuffer + sizeof (stdinBuffer))
+         *stdinDataEnd = 0;
+    }
+}
+
+int readInt()
+{
+    readAhead(16);
+
+    int x = 0;
+    bool neg = false;
+    while(*stdinPos < '0' or *stdinPos >'0')stdinPos++;
+    while (*stdinPos >= '0' && *stdinPos <= '9') {
+       x *= 10;
+       x += *stdinPos - '0';
+       ++stdinPos;
+    }
+
+    return neg ? -x : x;
 }
 int main(int argc, char *argv[])
 {
-    std::ios::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    // std::ios::sync_with_stdio(false);
+    // cin.tie(0);
+    // cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+    lo n, m, p;
+    n = readInt();
+    m = readInt();
+    p = readInt();
+    vl a(n), b(m);
+    REP(0, n)a[i] = readInt();
+    REP(0, m)b[i] = readInt();
+    reverse(all(a));
+    reverse(all(b));
+    auto F = FFT();
+    auto res = F.mult(a, b);
+    debug(res);
+    REP(0, n+m-1)
+        if(res[i]%p != 0){
+            cout << i << endl;
+            break;
         }
-        cout << res <<endl;
-    }
     return 0;
 }

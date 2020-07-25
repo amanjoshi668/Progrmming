@@ -173,49 +173,35 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+    lo T;
+    cin >> T;
+    REPV(t, 1, T+1){
+        string S;
+        cin >> S;
+        cout << "Case #" << t << ": ";
+        lo cur = 0;
+        REP(0, S.length()){
+            int c = S[i] - '0';
+            if(c >= cur){
+                REPV(j, 0, c-cur)
+                    cout << "(";
+            }
+            else{
+                REPV(j, 0, cur - c)
+                    cout << ")";
+            }
+            cur = c;
+            cout << S[i];
         }
-        cout << res <<endl;
+        REPV(j, 0, cur)
+            cout << ")";
+        cout << endl;
     }
     return 0;
 }

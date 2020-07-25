@@ -173,21 +173,47 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+vl dx = {0, 1, 0, -1};
+vl dy = {1, 0, -1, 0};
+vector<char> dir = {'R', 'D', 'L', 'U'};
+ll a[1001][1001];
+lo n;
+string s[1001];
+bool valid;
+void dfs(lo x, lo y, lo sx, lo sy){
+    // debug2(x, y);
+    REP(0, 4){
+        lo nx = x+dx[i];
+        lo ny = y+dy[i];
+        if(!(correct(nx, ny, n, n)))
+            continue;
+        if(nx == sx and ny == sy){
+            s[x][y] = dir[i];
+            valid = true;
+            return;
+        }
+        if(a[nx][ny] == make_pair(-2LL, -2LL) and s[nx][ny] == '-'){
+            s[x][y] = dir[i];
+            debug5(x, y, nx, ny, dir[i]);
+            dfs(nx, ny, sx, sy);
+            return;
+        }
     }
-    return res;
 }
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+void dfs2(lo x, lo y, lo sx, lo sy){
+    debug4(x+1, y+1, sx+1, sy+1);
+    REP(0, 4){
+        lo nx = x+dx[i];
+        lo ny = y+dy[i];
+        if(!(correct(nx, ny, n, n)))
+            continue;
+        if(a[nx][ny] == make_pair(sx, sy) and s[nx][ny] == '-'){
+            int f = i-2;
+            if(f<0)f+=4;
+            s[nx][ny] = dir[f];
+            dfs2(nx, ny, sx, sy);
+        }
+    }
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +221,56 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    cin >> n;
+    REPE(0, n, 0, n){
+        cin >> a[i][j];
+        a[i][j].X--;a[i][j].Y--;
     }
+    string temp = string(n, '-');
+    REP(0, n)s[i] = temp;
+    REPE(0, n, 0, n){
+        debug2(a[i][j], s[i][j]);
+        if(a[i][j] == make_pair(-2LL , -2LL) and s[i][j] == '-'){
+            debug("one");
+            valid = false;
+            dfs(i, j, i, j);
+            if(!valid){
+                cout <<"INVALID"<<endl;
+                return 0;
+            }
+        }
+        else if(a[i][j] == make_pair(i, j) and s[i][j] == '-'){
+            debug("two");
+            s[i][j] = 'X';
+            dfs2(i, j, i, j);
+        }
+    }
+    valid = true;
+    REPE(0, n, 0, n)if(s[i][j] == '-')valid = false;
+    if(!valid){
+                cout <<"INVALID"<<endl;
+                return 0;
+            }
+    cout << "VALID"<<endl;
+    REP(0, n)cout << s[i] << endl;
     return 0;
 }
+/*
+4
+2 3 2 3 2 3 2 3
+4 1 4 1 2 3 2 3
+4 1 4 1 3 3 2 3
+4 1 4 1 2 3 2 3
+
+4
+1 1 1 1 1 1 1 1 
+1 1 1 1 1 1 1 1 
+4 4 4 4 4 4 4 4 
+4 4 4 4 4 4 4 4
+
+4
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+*/

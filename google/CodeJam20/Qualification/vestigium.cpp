@@ -173,49 +173,41 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
-    }
-    return res;
-}
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
-}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo T;
+    cin >> T;
+    REPV(t, 1, T + 1)
     {
         lo n;
         cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        vvl a(n, vl(n, 0));
+        cin >> a;
+        lo row = 0, col = 0, trace = 0;
+        REP(0, n)
+        {
+            set<lo> RS, CS;
+            bool row_add = false, col_add = false;
+            REPV(j, 0, n)
+            {
+                if (RS.count(a[i][j]))
+                    row_add = true;
+                if (CS.count(a[j][i]))
+                    col_add = true;
+                RS.insert(a[i][j]);
+                CS.insert(a[j][i]);
+            }
+            row += row_add;
+            col += col_add;
+            trace += a[i][i];
         }
-        cout << res <<endl;
+
+        cout << "Case #" << t << ": ";
+        cout << trace << " " << row << " " << col << endl;
     }
     return 0;
 }

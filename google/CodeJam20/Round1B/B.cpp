@@ -173,21 +173,88 @@ struct custom_hash
         return splitmix64(x + FIXED_RANDOM);
     }
 };
-lo Pow(lo x, lo n)
-{
-    lo res = 1;
-    while (n > 0)
-    {
-        if (n & 1)
-            res = (res * x) % MOD;
-        x = (x * x) % MOD;
-        n /= 2;
+vl fun(map<int, char> &S, lo num, lo t, string s){
+    vl res;
+    REP((lo)pow(10LL, t-1), min((lo)pow(10LL, t)-1LL, num+1)){
+        lo t = i;
+        bool div = true;
+        string temp="";
+        while(t>0){
+            if(!S.count(t%10))
+                div = false;
+            if(div)
+                temp.push_back(S[t%10]);
+            t/=10;
+
+        }
+        reverse(all(temp));
+        if(!div)
+            res.push_back(i);
+        if(temp == s){
+            res.push_back(i);
+            res.push_back(i);
+        }
+        if(res.size() > 1)
+            return res;
     }
     return res;
 }
-lo inv(lo n)
-{
-    return Pow(n, MOD - 2);
+void solve(){
+    lo u;
+    cin >> u;
+    vector<pair<int, string>> A;
+    set<char> possible;
+    map<int, string> duM;
+    REP(0, 10000){
+        lo x;
+        string s;
+        cin >> x >> s;
+        A.push_back({x, s});
+        REPV(j, 0, s.length())
+            possible.insert(s[j]);
+        duM[x] = s;
+        // if()
+    }
+    auto d = possible;
+    sort(all(A));
+    int found = 0;
+    TRV(A)
+        d.erase(it.second[0]);
+    possible.erase(*d.begin());
+    set<lo> dig_f;
+    dig_f.insert(0);
+    map<int, char>M;
+    M[0] = *d.begin();
+    REPV(K, 0, 10)
+        TRV(duM){
+            lo num = it.first;
+            string s =  it.second;
+            auto X = fun(M, num, s.length(), s);
+            if(X.empty())
+                continue;
+            if(X.size() == 1){
+                lo i = s.length() - 1;
+                lo n = X[0];
+                while(n > 0){
+                    if(M.count(n%10)==0){
+                        debug5(n, num, s, n%10, s[i]);
+                        M[n%10] = s[i];
+                        dig_f.insert(n%10);
+                        possible.erase(s[i]);
+                    }
+                    n/=10;
+                    i--;
+                }
+            }
+        }
+    REP(0, 10){
+        if(M.count(i)==0){
+            M[i] = *possible.begin();
+            possible.erase(M[i]);
+        }
+        cout << M[i];
+    }
+    cout << endl;
 }
 int main(int argc, char *argv[])
 {
@@ -195,27 +262,26 @@ int main(int argc, char *argv[])
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
-    {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
-        }
-        cout << res <<endl;
+    lo T;
+    cin >> T;
+    REPV(t, 1, T+1){
+        cout << "Case #" << t << ": ";
+        solve();
     }
     return 0;
 }
+/*
+B
+C
+D
+E
+F
+G
+H
+I
+J
+BA
+CA
+DA
+
+*/

@@ -189,33 +189,43 @@ lo inv(lo n)
 {
     return Pow(n, MOD - 2);
 }
+bool fun(vector<string> A, int row, int col, int k)
+{
+    lo n = A.size();
+    lo m = A[0].length();
+    REPE(0, n, 0, m)
+    {
+        if (row & (1 << i) or col & (1 << j))
+            A[i][j] = '$';
+    }
+    lo cn = 0;
+    REPE(0, n, 0, m)
+    {
+        if (A[i][j] == '#')
+            cn++;
+    }
+    return cn == k;
+}
 int main(int argc, char *argv[])
 {
     std::ios::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
     cout.precision(20);
-    lo t;
-    cin >> t;
-    lo N = 1e5 + 100;
-    vl fact(N, 1);
-    vl power(N, 1);
-    REP(2, N)
-    fact[i] = (fact[i - 1] * i) % MOD;
-    while (t--)
+    lo n, m;
+    cin >> n >> m;
+    lo k;
+    cin >> k;
+    vector<string> A(n);
+    cin >> A;
+    lo res = 0;
+    REPV(row, 0, (1 << n))
     {
-        lo n;
-        cin >> n;
-        lo res=  0;
-        for(int i = 0; i <= n; i+=2){
-            lo ans = fact[n];
-            ans = (ans * inv(fact[n-i]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            ans = (ans * inv(fact[i/2]))%MOD;
-            res += ans;
-            debug2(i, res);
+        REPV(col, 0, (1 << m))
+        {
+            res += fun(A, row, col, k);
         }
-        cout << res <<endl;
     }
+    cout << res << endl;
     return 0;
 }
